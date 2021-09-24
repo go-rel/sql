@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"strings"
 	"time"
 
 	"github.com/go-rel/rel"
@@ -60,6 +61,20 @@ func ColumnMapper(column *rel.Column) (string, int, int) {
 	}
 
 	return typ, m, n
+}
+
+// ExtractString between two string.
+func ExtractString(s, left, right string) string {
+	var (
+		start = strings.Index(s, left)
+		end   = strings.LastIndex(s, right)
+	)
+
+	if start < 0 || end < 0 || start+len(left) >= end {
+		return s
+	}
+
+	return s[start+len(left) : end]
 }
 
 func toInt64(i interface{}) int64 {
