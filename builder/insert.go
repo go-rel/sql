@@ -57,7 +57,7 @@ func (i Insert) Build(table string, primaryField string, mutates map[string]rel.
 		buffer.WriteByte(')')
 	}
 
-	if i.ReturningPrimaryValue {
+	if i.ReturningPrimaryValue && primaryField != "" {
 		buffer.WriteString(" RETURNING ")
 		buffer.WriteEscape(primaryField)
 	}

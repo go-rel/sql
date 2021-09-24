@@ -57,7 +57,7 @@ func (ia InsertAll) Build(table string, primaryField string, fields []string, bu
 		}
 	}
 
-	if ia.ReturningPrimaryValue {
+	if ia.ReturningPrimaryValue && primaryField != "" {
 		buffer.WriteString(" RETURNING ")
 		buffer.WriteEscape(primaryField)
 	}
