@@ -24,33 +24,35 @@ func (i Insert) Build(table string, primaryField string, mutates map[string]rel.
 	if count == 0 && i.InsertDefaultValues {
 		buffer.WriteString(" DEFAULT VALUES")
 	} else {
-		// buffer.Arguments = make([]interface{}, count)
 		buffer.WriteString(" (")
 
-		n := 0
+		var (
+			n         = 0
+			arguments = make([]interface{}, 0, count)
+		)
+
 		for field, mut := range mutates {
-			if mut.Type == rel.ChangeSetOp {
-				buffer.WriteString(i.Name.Build(field))
+			if mut.Type != rel.ChangeSetOp {
+				continue
 			}
 
-			if n < count-1 {
+			if n > 0 {
 				buffer.WriteByte(',')
 			}
+
+			buffer.WriteString(i.Name.Build(field))
+			arguments = append(arguments, mut.Value)
 			n++
 		}
 
-		buffer.WriteString(") VALUES ")
+		buffer.WriteString(") VALUES (")
 
-		buffer.WriteByte('(')
-		for _, mut := range mutates {
-			if mut.Type == rel.ChangeSetOp {
-				buffer.WriteValue(mut.Value)
-			}
-
-			if n < count-1 {
+		for i, arg := range arguments {
+			if i > 0 {
 				buffer.WriteByte(',')
 			}
-			n++
+
+			buffer.WriteValue(arg)
 		}
 		buffer.WriteByte(')')
 	}

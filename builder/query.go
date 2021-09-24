@@ -17,7 +17,6 @@ type Query struct {
 func (q Query) Build(query rel.Query) (string, []interface{}) {
 	var buffer Buffer
 	q.Write(&buffer, query)
-	buffer.WriteString(";")
 
 	return buffer.String(), buffer.Arguments()
 }
@@ -30,8 +29,14 @@ func (q Query) Write(buffer *Buffer, query rel.Query) {
 		return
 	}
 
+	rootQuery := buffer.Len() == 0
+
 	q.BuildSelect(buffer, query.SelectQuery)
 	q.BuildQuery(buffer, query)
+
+	if rootQuery {
+		buffer.WriteByte(';')
+	}
 }
 
 // BuildSelect SQL to buffer.
