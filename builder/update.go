@@ -6,19 +6,19 @@ import (
 
 // Update builder.
 type Update struct {
-	Name   Name
-	Query  Query
-	Filter Filter
+	BufferFactory BufferFactory
+	Query         Query
+	Filter        Filter
 }
 
 // Build SQL string and it arguments.
 func (u Update) Build(table string, primaryField string, mutates map[string]rel.Mutate, filter rel.FilterQuery) (string, []interface{}) {
 	var (
-		buffer Buffer
+		buffer = u.BufferFactory.Create()
 	)
 
 	buffer.WriteString("UPDATE ")
-	buffer.WriteString(u.Name.Build(table))
+	buffer.WriteEscape(table)
 	buffer.WriteString(" SET ")
 
 	i := 0
@@ -34,13 +34,13 @@ func (u Update) Build(table string, primaryField string, mutates map[string]rel.
 
 		switch mut.Type {
 		case rel.ChangeSetOp:
-			buffer.WriteString(u.Name.Build(field))
+			buffer.WriteEscape(field)
 			buffer.WriteByte('=')
 			buffer.WriteValue(mut.Value)
 		case rel.ChangeIncOp:
-			buffer.WriteString(u.Name.Build(field))
+			buffer.WriteEscape(field)
 			buffer.WriteByte('=')
-			buffer.WriteString(u.Name.Build(field))
+			buffer.WriteEscape(field)
 			buffer.WriteByte('+')
 			buffer.WriteValue(mut.Value)
 		case rel.ChangeFragmentOp:

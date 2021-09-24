@@ -6,14 +6,14 @@ import (
 
 // InsertAll builder.
 type InsertAll struct {
-	Name                  Name
+	BufferFactory         BufferFactory
 	ReturningPrimaryValue bool
 }
 
 // Build SQL string and its arguments.
 func (ia InsertAll) Build(table string, primaryField string, fields []string, bulkMutates []map[string]rel.Mutate) (string, []interface{}) {
 	var (
-		buffer       Buffer
+		buffer       = ia.BufferFactory.Create()
 		fieldsCount  = len(fields)
 		mutatesCount = len(bulkMutates)
 	)
@@ -22,11 +22,11 @@ func (ia InsertAll) Build(table string, primaryField string, fields []string, bu
 
 	buffer.WriteString("INSERT INTO ")
 
-	buffer.WriteString(ia.Name.Build(table))
+	buffer.WriteEscape(table)
 	buffer.WriteString(" (")
 
 	for i := range fields {
-		buffer.WriteString(ia.Name.Build(fields[i]))
+		buffer.WriteEscape(fields[i])
 
 		if i < fieldsCount-1 {
 			buffer.WriteByte(',')
@@ -59,7 +59,7 @@ func (ia InsertAll) Build(table string, primaryField string, fields []string, bu
 
 	if ia.ReturningPrimaryValue {
 		buffer.WriteString(" RETURNING ")
-		buffer.WriteString(ia.Name.Build(primaryField))
+		buffer.WriteEscape(primaryField)
 	}
 
 	buffer.WriteString(";")

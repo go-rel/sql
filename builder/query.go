@@ -9,13 +9,16 @@ import (
 
 // Query builder.
 type Query struct {
-	Name   Name
-	Filter Filter
+	BufferFactory BufferFactory
+	Filter        Filter
 }
 
 // Build SQL string and it arguments.
 func (q Query) Build(query rel.Query) (string, []interface{}) {
-	var buffer Buffer
+	var (
+		buffer = q.BufferFactory.Create()
+	)
+
 	q.Write(&buffer, query)
 
 	return buffer.String(), buffer.Arguments()
@@ -58,7 +61,7 @@ func (q Query) BuildSelect(buffer *Buffer, selectQuery rel.SelectQuery) {
 
 	l := len(selectQuery.Fields) - 1
 	for i, f := range selectQuery.Fields {
-		buffer.WriteString(q.Name.Build(f))
+		buffer.WriteEscape(f)
 
 		if i < l {
 			buffer.WriteByte(',')
@@ -89,7 +92,7 @@ func (q Query) BuildQuery(buffer *Buffer, query rel.Query) {
 // BuildFrom SQL to buffer.
 func (q Query) BuildFrom(buffer *Buffer, table string) {
 	buffer.WriteString(" FROM ")
-	buffer.WriteString(q.Name.Build(table))
+	buffer.WriteEscape(table)
 }
 
 // BuildJoin SQL to buffer.
@@ -100,14 +103,14 @@ func (q Query) BuildJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
 
 	for _, join := range joins {
 		var (
-			from = q.Name.Build(join.From)
-			to   = q.Name.Build(join.To)
+			from = join.From
+			to   = join.To
 		)
 
 		// TODO: move this to core functionality, and infer join condition using assoc data.
 		if join.Arguments == nil && (join.From == "" || join.To == "") {
-			from = q.Name.Build(table + "." + strings.TrimSuffix(join.Table, "s") + "_id")
-			to = q.Name.Build(join.Table + ".id")
+			from = table + "." + strings.TrimSuffix(join.Table, "s") + "_id"
+			to = join.Table + ".id"
 		}
 
 		buffer.WriteByte(' ')
@@ -115,11 +118,11 @@ func (q Query) BuildJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
 		buffer.WriteByte(' ')
 
 		if join.Table != "" {
-			buffer.WriteString(q.Name.Build(join.Table))
+			buffer.WriteEscape(join.Table)
 			buffer.WriteString(" ON ")
-			buffer.WriteString(from)
+			buffer.WriteEscape(from)
 			buffer.WriteString("=")
-			buffer.WriteString(to)
+			buffer.WriteEscape(to)
 		}
 
 		buffer.AddArguments(join.Arguments...)
@@ -142,7 +145,7 @@ func (q Query) BuildGroupBy(buffer *Buffer, fields []string) {
 
 	l := len(fields) - 1
 	for i, f := range fields {
-		buffer.WriteString(q.Name.Build(f))
+		buffer.WriteEscape(f)
 
 		if i < l {
 			buffer.WriteByte(',')
@@ -172,7 +175,7 @@ func (q Query) BuildOrderBy(buffer *Buffer, orders []rel.SortQuery) {
 
 	buffer.WriteString(" ORDER BY ")
 	for i, order := range orders {
-		buffer.WriteString(q.Name.Build(order.Field))
+		buffer.WriteEscape(order.Field)
 
 		if order.Asc() {
 			buffer.WriteString(" ASC")

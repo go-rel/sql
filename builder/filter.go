@@ -5,9 +5,7 @@ import (
 )
 
 // Filter builder.
-type Filter struct {
-	Name Name
-}
+type Filter struct{}
 
 // Write SQL to buffer.
 func (f Filter) Write(buffer *Buffer, filter rel.FilterQuery, queryBuilder Query) {
@@ -27,20 +25,20 @@ func (f Filter) Write(buffer *Buffer, filter rel.FilterQuery, queryBuilder Query
 		rel.FilterGteOp:
 		f.BuildComparison(buffer, filter, queryBuilder)
 	case rel.FilterNilOp:
-		buffer.WriteString(f.Name.Build(filter.Field))
+		buffer.WriteEscape(filter.Field)
 		buffer.WriteString(" IS NULL")
 	case rel.FilterNotNilOp:
-		buffer.WriteString(f.Name.Build(filter.Field))
+		buffer.WriteEscape(filter.Field)
 		buffer.WriteString(" IS NOT NULL")
 	case rel.FilterInOp,
 		rel.FilterNinOp:
 		f.BuildInclusion(buffer, filter, queryBuilder)
 	case rel.FilterLikeOp:
-		buffer.WriteString(f.Name.Build(filter.Field))
+		buffer.WriteEscape(filter.Field)
 		buffer.WriteString(" LIKE ")
 		buffer.WriteValue(filter.Value)
 	case rel.FilterNotLikeOp:
-		buffer.WriteString(f.Name.Build(filter.Field))
+		buffer.WriteEscape(filter.Field)
 		buffer.WriteString(" NOT LIKE ")
 		buffer.WriteValue(filter.Value)
 	case rel.FilterFragmentOp:
@@ -76,7 +74,7 @@ func (f Filter) BuildLogical(buffer *Buffer, op string, inner []rel.FilterQuery,
 
 // BuildComparison SQL to buffer.
 func (f Filter) BuildComparison(buffer *Buffer, filter rel.FilterQuery, queryBuilder Query) {
-	buffer.WriteString(f.Name.Build(filter.Field))
+	buffer.WriteEscape(filter.Field)
 
 	switch filter.Type {
 	case rel.FilterEqOp:
@@ -112,7 +110,7 @@ func (f Filter) BuildInclusion(buffer *Buffer, filter rel.FilterQuery, queryBuil
 		values = filter.Value.([]interface{})
 	)
 
-	buffer.WriteString(f.Name.Build(filter.Field))
+	buffer.WriteEscape(filter.Field)
 
 	if filter.Type == rel.FilterInOp {
 		buffer.WriteString(" IN ")

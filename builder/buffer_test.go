@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestName_Build(t *testing.T) {
-	builder := Name{Prefix: "[", Suffix: "]"}
+func TestBuffer_escape(t *testing.T) {
+	buffer := Buffer{EscapePrefix: "[", EscapeSuffix: "]"}
 
 	tests := []struct {
 		field  string
@@ -37,7 +37,7 @@ func TestName_Build(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
 			var (
-				result = builder.Build(test.field)
+				result = buffer.escape(test.field)
 			)
 
 			assert.Equal(t, test.result, result)

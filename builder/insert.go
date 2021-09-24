@@ -6,7 +6,7 @@ import (
 
 // Insert builder.
 type Insert struct {
-	Name                  Name
+	BufferFactory         BufferFactory
 	ReturningPrimaryValue bool
 	InsertDefaultValues   bool
 }
@@ -14,12 +14,12 @@ type Insert struct {
 // Build sql query and its arguments.
 func (i Insert) Build(table string, primaryField string, mutates map[string]rel.Mutate) (string, []interface{}) {
 	var (
-		buffer Buffer
+		buffer = i.BufferFactory.Create()
 		count  = len(mutates)
 	)
 
 	buffer.WriteString("INSERT INTO ")
-	buffer.WriteString(i.Name.Build(table))
+	buffer.WriteEscape(table)
 
 	if count == 0 && i.InsertDefaultValues {
 		buffer.WriteString(" DEFAULT VALUES")
@@ -40,7 +40,7 @@ func (i Insert) Build(table string, primaryField string, mutates map[string]rel.
 				buffer.WriteByte(',')
 			}
 
-			buffer.WriteString(i.Name.Build(field))
+			buffer.WriteEscape(field)
 			arguments = append(arguments, mut.Value)
 			n++
 		}
@@ -59,7 +59,7 @@ func (i Insert) Build(table string, primaryField string, mutates map[string]rel.
 
 	if i.ReturningPrimaryValue {
 		buffer.WriteString(" RETURNING ")
-		buffer.WriteString(i.Name.Build(primaryField))
+		buffer.WriteEscape(primaryField)
 	}
 
 	buffer.WriteString(";")

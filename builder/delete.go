@@ -6,17 +6,19 @@ import (
 
 // Delete builder.
 type Delete struct {
-	Name   Name
-	Query  Query
-	Filter Filter
+	BufferFactory BufferFactory
+	Query         Query
+	Filter        Filter
 }
 
 // Build SQL query and its arguments.
 func (ds Delete) Build(table string, filter rel.FilterQuery) (string, []interface{}) {
-	var buffer Buffer
+	var (
+		buffer = ds.BufferFactory.Create()
+	)
 
 	buffer.WriteString("DELETE FROM ")
-	buffer.WriteString(ds.Name.Build(table))
+	buffer.WriteEscape(table)
 
 	if !filter.None() {
 		buffer.WriteString(" WHERE ")

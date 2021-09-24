@@ -6,13 +6,13 @@ import (
 
 // Index builder.
 type Index struct {
-	Name             Name
+	BufferFactory    BufferFactory
 	DropIndexOnTable bool
 }
 
 // Build sql query for index.
 func (i Index) Build(index rel.Index) string {
-	var buffer Buffer
+	buffer := i.BufferFactory.Create()
 
 	switch index.Op {
 	case rel.SchemaCreate:
@@ -39,16 +39,16 @@ func (i Index) WriteCreateIndex(buffer *Buffer, index rel.Index) {
 		buffer.WriteString("IF NOT EXISTS ")
 	}
 
-	buffer.WriteString(i.Name.Build(index.Name))
+	buffer.WriteEscape(index.Name)
 	buffer.WriteString(" ON ")
-	buffer.WriteString(i.Name.Build(index.Table))
+	buffer.WriteEscape(index.Table)
 
 	buffer.WriteString(" (")
 	for n, col := range index.Columns {
 		if n > 0 {
 			buffer.WriteString(", ")
 		}
-		buffer.WriteString(i.Name.Build(col))
+		buffer.WriteEscape(col)
 	}
 	buffer.WriteString(")")
 }
@@ -61,11 +61,11 @@ func (i Index) WriteDropIndex(buffer *Buffer, index rel.Index) {
 		buffer.WriteString("IF EXISTS ")
 	}
 
-	buffer.WriteString(i.Name.Build(index.Name))
+	buffer.WriteEscape(index.Name)
 
 	if i.DropIndexOnTable {
 		buffer.WriteString(" ON ")
-		buffer.WriteString(i.Name.Build(index.Table))
+		buffer.WriteEscape(index.Table)
 	}
 }
 
