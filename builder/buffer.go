@@ -30,14 +30,21 @@ type Buffer struct {
 
 // WriteValue query placeholder and append value to argument.
 func (b *Buffer) WriteValue(value interface{}) {
-	b.valueCount++
+	b.WritePlaceholder()
 	b.arguments = append(b.arguments, value)
+}
+
+// WritePlaceholder without adding argument.
+// argument can be added later using AddArguments function.
+func (b *Buffer) WritePlaceholder() {
+	b.valueCount++
 	b.WriteString(b.ArgumentPlaceholder)
 	if b.ArgumentOrdinal {
 		b.WriteString(strconv.Itoa(b.valueCount))
 	}
 }
 
+// WriteEscape string.
 func (b *Buffer) WriteEscape(value string) {
 	b.WriteString(b.escape(value))
 }
@@ -73,7 +80,11 @@ func (b Buffer) escape(value string) string {
 
 // AddArguments appends multiple arguments without writing placeholder query..
 func (b *Buffer) AddArguments(args ...interface{}) {
-	b.arguments = append(b.arguments, args...)
+	if b.arguments == nil {
+		b.arguments = args
+	} else {
+		b.arguments = append(b.arguments, args...)
+	}
 }
 
 func (b Buffer) Arguments() []interface{} {

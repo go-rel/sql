@@ -18,10 +18,7 @@ func (ia InsertAll) Build(table string, primaryField string, fields []string, bu
 		mutatesCount = len(bulkMutates)
 	)
 
-	// buffer.Arguments = make([]interface{}, 0, fieldsCount*mutatesCount)
-
 	buffer.WriteString("INSERT INTO ")
-
 	buffer.WriteEscape(table)
 	buffer.WriteString(" (")
 

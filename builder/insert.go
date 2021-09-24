@@ -47,13 +47,14 @@ func (i Insert) Build(table string, primaryField string, mutates map[string]rel.
 
 		buffer.WriteString(") VALUES (")
 
-		for i, arg := range arguments {
+		for i := range arguments {
 			if i > 0 {
 				buffer.WriteByte(',')
 			}
 
-			buffer.WriteValue(arg)
+			buffer.WritePlaceholder()
 		}
+		buffer.AddArguments(arguments...)
 		buffer.WriteByte(')')
 	}
 

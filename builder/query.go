@@ -179,16 +179,16 @@ func (q Query) BuildOrderBy(buffer *Buffer, orders []rel.SortQuery) {
 
 	buffer.WriteString(" ORDER BY ")
 	for i, order := range orders {
+		if i > 0 {
+			buffer.WriteString(", ")
+		}
+
 		buffer.WriteEscape(order.Field)
 
 		if order.Asc() {
 			buffer.WriteString(" ASC")
 		} else {
 			buffer.WriteString(" DESC")
-		}
-
-		if i < length-1 {
-			buffer.WriteByte(',')
 		}
 	}
 }
