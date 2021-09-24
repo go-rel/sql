@@ -7,6 +7,10 @@ import (
 	"github.com/go-rel/rel"
 )
 
+type QueryWriter interface {
+	Write(buffer *Buffer, query rel.Query)
+}
+
 // Query builder.
 type Query struct {
 	BufferFactory BufferFactory
