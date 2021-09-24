@@ -7,7 +7,7 @@ import (
 // Update builder.
 type Update struct {
 	BufferFactory BufferFactory
-	Query         Query
+	Query         QueryWriter
 	Filter        Filter
 }
 

@@ -7,7 +7,7 @@ import (
 // Delete builder.
 type Delete struct {
 	BufferFactory BufferFactory
-	Query         Query
+	Query         QueryWriter
 	Filter        Filter
 }
 
