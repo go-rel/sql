@@ -106,7 +106,7 @@ func (s SQL) Begin(ctx context.Context) (rel.Adapter, error) {
 		Tx:               tx,
 		Savepoint:        savepoint,
 		Instrumenter:     s.Instrumenter,
-	}, err
+	}, s.ErrorMapper(err)
 }
 
 // Commit commits current transaction.
@@ -125,7 +125,7 @@ func (s SQL) Commit(ctx context.Context) error {
 
 	finish(err)
 
-	return err
+	return s.ErrorMapper(err)
 }
 
 // Rollback revert current transaction.
@@ -144,7 +144,7 @@ func (s SQL) Rollback(ctx context.Context) error {
 
 	finish(err)
 
-	return err
+	return s.ErrorMapper(err)
 }
 
 // Ping database.
@@ -153,6 +153,8 @@ func (s SQL) Ping(ctx context.Context) error {
 }
 
 // Close database connection.
+//
+// TODO: add closer to adapter interface
 func (s SQL) Close() error {
 	return s.DB.Close()
 }
@@ -198,7 +200,7 @@ func (s SQL) Aggregate(ctx context.Context, query rel.Query, mode string, field 
 		rows.Scan(&out)
 	}
 
-	return int(out.Int64), err
+	return int(out.Int64), s.ErrorMapper(err)
 }
 
 // Insert inserts a record to database and returns its id.
