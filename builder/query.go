@@ -38,16 +38,16 @@ func (q Query) Write(buffer *Buffer, query rel.Query) {
 
 	rootQuery := buffer.Len() == 0
 
-	q.BuildSelect(buffer, query.SelectQuery)
-	q.BuildQuery(buffer, query)
+	q.WriteSelect(buffer, query.SelectQuery)
+	q.WriteQuery(buffer, query)
 
 	if rootQuery {
 		buffer.WriteByte(';')
 	}
 }
 
-// BuildSelect SQL to buffer.
-func (q Query) BuildSelect(buffer *Buffer, selectQuery rel.SelectQuery) {
+// WriteSelect SQL to buffer.
+func (q Query) WriteSelect(buffer *Buffer, selectQuery rel.SelectQuery) {
 	if len(selectQuery.Fields) == 0 {
 		if selectQuery.OnlyDistinct {
 			buffer.WriteString("SELECT DISTINCT *")
@@ -73,19 +73,19 @@ func (q Query) BuildSelect(buffer *Buffer, selectQuery rel.SelectQuery) {
 	}
 }
 
-// BuildQuery SQL to buffer.
-func (q Query) BuildQuery(buffer *Buffer, query rel.Query) {
-	q.BuildFrom(buffer, query.Table)
-	q.BuildJoin(buffer, query.Table, query.JoinQuery)
-	q.BuildWhere(buffer, query.WhereQuery)
+// WriteQuery SQL to buffer.
+func (q Query) WriteQuery(buffer *Buffer, query rel.Query) {
+	q.WriteFrom(buffer, query.Table)
+	q.WriteJoin(buffer, query.Table, query.JoinQuery)
+	q.WriteWhere(buffer, query.WhereQuery)
 
 	if len(query.GroupQuery.Fields) > 0 {
-		q.BuildGroupBy(buffer, query.GroupQuery.Fields)
-		q.BuildHaving(buffer, query.GroupQuery.Filter)
+		q.WriteGroupBy(buffer, query.GroupQuery.Fields)
+		q.WriteHaving(buffer, query.GroupQuery.Filter)
 	}
 
-	q.BuildOrderBy(buffer, query.SortQuery)
-	q.BuildLimitOffset(buffer, query.LimitQuery, query.OffsetQuery)
+	q.WriteOrderBy(buffer, query.SortQuery)
+	q.WriteLimitOffet(buffer, query.LimitQuery, query.OffsetQuery)
 
 	if query.LockQuery != "" {
 		buffer.WriteByte(' ')
@@ -93,14 +93,14 @@ func (q Query) BuildQuery(buffer *Buffer, query rel.Query) {
 	}
 }
 
-// BuildFrom SQL to buffer.
-func (q Query) BuildFrom(buffer *Buffer, table string) {
+// WriteFrom SQL to buffer.
+func (q Query) WriteFrom(buffer *Buffer, table string) {
 	buffer.WriteString(" FROM ")
 	buffer.WriteEscape(table)
 }
 
-// BuildJoin SQL to buffer.
-func (q Query) BuildJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
+// WriteJoin SQL to buffer.
+func (q Query) WriteJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
 	if len(joins) == 0 {
 		return
 	}
@@ -133,8 +133,8 @@ func (q Query) BuildJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
 	}
 }
 
-// BuildWhere SQL to buffer.
-func (q Query) BuildWhere(buffer *Buffer, filter rel.FilterQuery) {
+// WriteWhere SQL to buffer.
+func (q Query) WriteWhere(buffer *Buffer, filter rel.FilterQuery) {
 	if filter.None() {
 		return
 	}
@@ -143,8 +143,8 @@ func (q Query) BuildWhere(buffer *Buffer, filter rel.FilterQuery) {
 	q.Filter.Write(buffer, filter, q)
 }
 
-// BuildGroupBy SQL to buffer.
-func (q Query) BuildGroupBy(buffer *Buffer, fields []string) {
+// WriteGroupBy SQL to buffer.
+func (q Query) WriteGroupBy(buffer *Buffer, fields []string) {
 	buffer.WriteString(" GROUP BY ")
 
 	l := len(fields) - 1
@@ -157,8 +157,8 @@ func (q Query) BuildGroupBy(buffer *Buffer, fields []string) {
 	}
 }
 
-// BuildHaving SQL to buffer.
-func (q Query) BuildHaving(buffer *Buffer, filter rel.FilterQuery) {
+// WriteHaving SQL to buffer.
+func (q Query) WriteHaving(buffer *Buffer, filter rel.FilterQuery) {
 	if filter.None() {
 		return
 	}
@@ -167,8 +167,8 @@ func (q Query) BuildHaving(buffer *Buffer, filter rel.FilterQuery) {
 	q.Filter.Write(buffer, filter, q)
 }
 
-// BuildOrderBy SQL to buffer.
-func (q Query) BuildOrderBy(buffer *Buffer, orders []rel.SortQuery) {
+// WriteOrderBy SQL to buffer.
+func (q Query) WriteOrderBy(buffer *Buffer, orders []rel.SortQuery) {
 	var (
 		length = len(orders)
 	)
@@ -193,8 +193,8 @@ func (q Query) BuildOrderBy(buffer *Buffer, orders []rel.SortQuery) {
 	}
 }
 
-// BuildLimitOffset SQL to buffer.
-func (q Query) BuildLimitOffset(buffer *Buffer, limit rel.Limit, offset rel.Offset) {
+// WriteLimitOffet SQL to buffer.
+func (q Query) WriteLimitOffet(buffer *Buffer, limit rel.Limit, offset rel.Offset) {
 	if limit > 0 {
 		buffer.WriteString(" LIMIT ")
 		buffer.WriteString(strconv.Itoa(int(limit)))
