@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        ssh-key: "${{ secrets.PUSH_TAG_PRIVATE_KEY }}"
 
     - uses: actions-ecosystem/action-get-latest-tag@v1
       id: get-latest-tag
