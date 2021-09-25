@@ -58,6 +58,17 @@ func TestIndex_Build(t *testing.T) {
 			},
 		},
 		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `table` (`column1`) COMMENT 'comment';",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
+				Options:  "COMMENT 'comment'",
+			},
+		},
+		{
 			result: "DROP INDEX `index` ON `table`;",
 			index: rel.Index{
 				Op:    rel.SchemaDrop,

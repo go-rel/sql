@@ -44,3 +44,21 @@ func TestBuffer_escape(t *testing.T) {
 		})
 	}
 }
+
+func TestBuffer_Arguments(t *testing.T) {
+	var (
+		buffer           = Buffer{EscapePrefix: "[", EscapeSuffix: "]"}
+		initialArguments = []interface{}{1}
+	)
+
+	assert.Nil(t, buffer.Arguments())
+
+	buffer.AddArguments(initialArguments...)
+	assert.Equal(t, initialArguments, buffer.Arguments())
+
+	buffer.AddArguments(2)
+	assert.Equal(t, []interface{}{1, 2}, buffer.Arguments())
+
+	buffer.Reset()
+	assert.Nil(t, buffer.Arguments())
+}

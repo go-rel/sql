@@ -32,17 +32,15 @@ func (i Insert) Build(table string, primaryField string, mutates map[string]rel.
 		)
 
 		for field, mut := range mutates {
-			if mut.Type != rel.ChangeSetOp {
-				continue
-			}
+			if mut.Type == rel.ChangeSetOp {
+				if n > 0 {
+					buffer.WriteByte(',')
+				}
 
-			if n > 0 {
-				buffer.WriteByte(',')
+				buffer.WriteEscape(field)
+				arguments = append(arguments, mut.Value)
+				n++
 			}
-
-			buffer.WriteEscape(field)
-			arguments = append(arguments, mut.Value)
-			n++
 		}
 
 		buffer.WriteString(") VALUES (")

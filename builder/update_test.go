@@ -19,6 +19,7 @@ func TestUpdate_Build(t *testing.T) {
 			Filter:        filter,
 		}
 		mutates = map[string]rel.Mutate{
+			"id":    rel.Set("id", 10),
 			"name":  rel.Set("name", "foo"),
 			"age":   rel.Set("age", 10),
 			"agree": rel.Set("agree", true),
