@@ -36,5 +36,7 @@ jobs:
         echo "::debug::New tag is $new_tag"
 
         # push new tag
+        git config user.name "${GITHUB_ACTOR}"
+        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
         git tag -a $new_tag -m "$new_tag"
         git push origin $new_tag
