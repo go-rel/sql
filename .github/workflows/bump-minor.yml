@@ -9,9 +9,21 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ssh-key: "${{ secrets.PUSH_TAG_PRIVATE_KEY }}"
-    - name: Bump minor version and push tag
-      uses: anothrNick/github-tag-action@1.36.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: true
-        DEFAULT_BUMP: minor
+
+    - uses: Fs02/action-get-latest-tag@main
+      id: get-latest-tag
+      with:
+        semver_only: true
+        initial_version: "v0.0.0"
+        with_initial_version: true
+
+    - uses: actions-ecosystem/action-bump-semver@v1
+      id: bump-semver
+      with:
+        current_version: ${{ steps.get-latest-tag.outputs.tag }}
+        level: minor
+
+    - uses: actions-ecosystem/action-push-tag@v1
+      with:
+        tag: ${{ steps.bump-semver.outputs.new_version }}
+        message: '${{ steps.bump-semver.outputs.new_version }}'
