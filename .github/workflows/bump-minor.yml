@@ -1,10 +1,6 @@
 name: Bump minor version
 
-# on: workflow_dispatch
-on:
-  push:
-    branches:
-      - master
+on: workflow_dispatch
 
 jobs:
   release:
@@ -25,11 +21,7 @@ jobs:
           current_version: ${{ steps.get-latest-tag.outputs.tag }}
           level: minor
 
-      - name: just echo a message
-        run: |
-          echo '${{ steps.get-latest-tag.outputs.tag }}'
-
-#       - uses: actions-ecosystem/action-push-tag@v1
-#         with:
-#           tag: ${{ steps.bump-semver.outputs.new_version }}
-#           message: '${{ steps.bump-semver.outputs.new_version }}'
+      - uses: actions-ecosystem/action-push-tag@v1
+        with:
+          tag: ${{ steps.bump-semver.outputs.new_version }}
+          message: '${{ steps.bump-semver.outputs.new_version }}'
