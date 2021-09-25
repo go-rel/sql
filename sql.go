@@ -118,7 +118,7 @@ func (s SQL) Commit(ctx context.Context) error {
 	if s.Tx == nil {
 		err = errors.New("unable to commit outside transaction")
 	} else if s.Savepoint > 0 {
-		_, err = s.Tx.ExecContext(ctx, "RELEASE SAVEPOINT s"+strconv.Itoa(s.Savepoint)+";", []interface{}{})
+		_, err = s.Tx.ExecContext(ctx, "RELEASE SAVEPOINT s"+strconv.Itoa(s.Savepoint)+";")
 	} else {
 		err = s.Tx.Commit()
 	}
