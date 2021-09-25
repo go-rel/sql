@@ -10,7 +10,7 @@ jobs:
       with:
         ssh-key: "${{ secrets.PUSH_TAG_PRIVATE_KEY }}"
 
-    - name: Get latest tag
+    - name: Bump version
       run: |
         git fetch --tags
         # This suppress an error occurred when the repository is a complete one.
@@ -32,7 +32,7 @@ jobs:
 
         # bump version
         npm install -g semver
-        new_tag=semver $latest_tag -i minor
+        new_tag=v$(semver $latest_tag -i minor)
         echo "::debug::New tag is $new_tag"
 
         # push new tag
