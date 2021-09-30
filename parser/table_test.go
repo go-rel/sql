@@ -30,9 +30,7 @@ func TestTable_Parse(t *testing.T) {
 		table  = rel.Table{Op: rel.SchemaCreate, Name: "points", Options: "ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"}
 	)
 
-	println(TableRegexp("`", "`").String())
-
-	table.Int("id", rel.Unsigned(true), rel.Required(true), rel.Options("AUTO_INCREMENT"))
+	table.ID("id")
 	table.DateTime("created_at")
 	table.DateTime("updated_at")
 	table.String("name", rel.Limit(255))
