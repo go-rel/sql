@@ -9,9 +9,14 @@ import (
 
 func TestIndex_Build(t *testing.T) {
 	var (
-		indexBuilder = Index{
-			BufferFactory:    BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"},
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		filter        = Filter{}
+		indexBuilder  = Index{
+			BufferFactory:    bufferFactory,
+			Query:            Query{BufferFactory: bufferFactory, Filter: filter},
+			Filter:           filter,
 			DropIndexOnTable: true,
+			SupportFilter:    true,
 		}
 	)
 
@@ -66,6 +71,21 @@ func TestIndex_Build(t *testing.T) {
 				Optional: true,
 				Columns:  []string{"column1"},
 				Options:  "COMMENT 'comment'",
+			},
+		},
+		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `table` (`column1`) WHERE `deleted`=false;",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
+				Filter: rel.FilterQuery{
+					Type:  rel.FilterEqOp,
+					Field: "deleted",
+					Value: false,
+				},
 			},
 		},
 		{
