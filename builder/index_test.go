@@ -9,9 +9,14 @@ import (
 
 func TestIndex_Build(t *testing.T) {
 	var (
-		indexBuilder = Index{
-			BufferFactory:    BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"},
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		filter        = Filter{}
+		indexBuilder  = Index{
+			BufferFactory:    bufferFactory,
+			Query:            Query{BufferFactory: bufferFactory, Filter: filter},
+			Filter:           filter,
 			DropIndexOnTable: true,
+			SupportFilter:    true,
 		}
 	)
 
@@ -69,6 +74,36 @@ func TestIndex_Build(t *testing.T) {
 			},
 		},
 		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `table` (`column1`) WHERE `deleted`=false;",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
+				Filter: rel.FilterQuery{
+					Type:  rel.FilterEqOp,
+					Field: "deleted",
+					Value: false,
+				},
+			},
+		},
+		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `table` (`column1`) WHERE `status`='test''s status';",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
+				Filter: rel.FilterQuery{
+					Type:  rel.FilterEqOp,
+					Field: "status",
+					Value: "test's status",
+				},
+			},
+		},
+		{
 			result: "DROP INDEX `index` ON `table`;",
 			index: rel.Index{
 				Op:    rel.SchemaDrop,
@@ -83,6 +118,46 @@ func TestIndex_Build(t *testing.T) {
 				Name:     "index",
 				Table:    "table",
 				Optional: true,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.result, func(t *testing.T) {
+			assert.Equal(t, test.result, indexBuilder.Build(test.index))
+		})
+	}
+}
+
+func TestIndex_BuildWithUnsupportedPartial(t *testing.T) {
+	var (
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		filter        = Filter{}
+		indexBuilder  = Index{
+			BufferFactory:    bufferFactory,
+			Query:            Query{BufferFactory: bufferFactory, Filter: filter},
+			Filter:           filter,
+			DropIndexOnTable: true,
+		}
+	)
+
+	tests := []struct {
+		result string
+		index  rel.Index
+	}{
+		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `table` (`column1`);",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
+				Filter: rel.FilterQuery{
+					Type:  rel.FilterEqOp,
+					Field: "deleted",
+					Value: false,
+				},
 			},
 		},
 	}

@@ -12,7 +12,7 @@ import (
 func BenchmarkQuery_Build(b *testing.B) {
 	var (
 		queryBuilder = Query{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 			Filter:        Filter{},
 		}
 	)
@@ -33,7 +33,7 @@ func BenchmarkQuery_Build(b *testing.B) {
 func TestQuery_Build(t *testing.T) {
 	var (
 		queryBuilder = Query{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 			Filter:        Filter{},
 		}
 		query = rel.From("users")
@@ -111,7 +111,7 @@ func TestQuery_Build(t *testing.T) {
 func TestQuery_Build_ordinal(t *testing.T) {
 	var (
 		queryBuilder = Query{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, EscapePrefix: "\"", EscapeSuffix: "\""},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: Quote{IDPrefix: "\"", IDSuffix: "\""}},
 			Filter:        Filter{},
 		}
 		query = rel.From("users")
@@ -193,7 +193,7 @@ func TestQuery_Build_ordinal(t *testing.T) {
 func TestQuery_Build_SQLQuery(t *testing.T) {
 	var (
 		queryBuilder = Query{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 			Filter:        Filter{},
 		}
 		query    = rel.Build("", rel.SQL("SELECT * FROM `users` WHERE id=?;", 1))
@@ -206,7 +206,7 @@ func TestQuery_Build_SQLQuery(t *testing.T) {
 
 func TestQuery_WriteSelect(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -261,7 +261,7 @@ func TestQuery_WriteSelect(t *testing.T) {
 
 func TestQuery_WriteFrom(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 		buffer        = bufferFactory.Create()
 	)
@@ -272,7 +272,7 @@ func TestQuery_WriteFrom(t *testing.T) {
 
 func TestQuery_WriteJoin(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -318,7 +318,7 @@ func TestQuery_WriteJoin(t *testing.T) {
 
 func TestQuery_WriteWhere(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -355,7 +355,7 @@ func TestQuery_WriteWhere(t *testing.T) {
 
 func TestQuery_WriteWhere_ordinal(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, EscapePrefix: "\"", EscapeSuffix: "\""}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: Quote{IDPrefix: "\"", IDSuffix: "\""}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -392,7 +392,7 @@ func TestQuery_WriteWhere_ordinal(t *testing.T) {
 
 func TestQuery_WriteWhere_SubQuery(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -440,7 +440,7 @@ func TestQuery_WriteWhere_SubQuery(t *testing.T) {
 
 func TestQuery_WriteWhere_SubQuery_ordinal(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, EscapePrefix: "\"", EscapeSuffix: "\""}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: Quote{IDPrefix: "\"", IDSuffix: "\""}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -490,7 +490,7 @@ func TestQuery_WriteWhere_SubQuery_ordinal(t *testing.T) {
 
 func TestQuery_WriteGroupBy(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -509,7 +509,7 @@ func TestQuery_WriteGroupBy(t *testing.T) {
 
 func TestQuery_WriteHaving(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -550,7 +550,7 @@ func TestQuery_WriteHaving(t *testing.T) {
 
 func TestQuery_WriteHaving_ordinal(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, EscapePrefix: "\"", EscapeSuffix: "\""}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: Quote{IDPrefix: "\"", IDSuffix: "\""}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -587,7 +587,7 @@ func TestQuery_WriteHaving_ordinal(t *testing.T) {
 
 func TestQuery_WriteOrderBy(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 
@@ -607,7 +607,7 @@ func TestQuery_WriteOrderBy(t *testing.T) {
 
 func TestQuery_WriteLimitOffset(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		queryBuilder  = Query{BufferFactory: bufferFactory}
 	)
 

@@ -9,7 +9,7 @@ import (
 
 func TestDelete_Builder(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		deleteBuilder = Delete{
 			BufferFactory: bufferFactory,
@@ -29,7 +29,7 @@ func TestDelete_Builder(t *testing.T) {
 
 func TestDelete_Builder_ordinal(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, EscapePrefix: "\"", EscapeSuffix: "\""}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: Quote{IDPrefix: "\"", IDSuffix: "\""}}
 		filter        = Filter{}
 		deleteBuilder = Delete{
 			BufferFactory: bufferFactory,

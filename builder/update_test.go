@@ -11,7 +11,7 @@ import (
 
 func TestUpdate_Build(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		updateBuilder = Update{
 			BufferFactory: bufferFactory,
@@ -37,7 +37,7 @@ func TestUpdate_Build(t *testing.T) {
 
 func TestUpdate_Build_ordinal(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, EscapePrefix: "\"", EscapeSuffix: "\""}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: Quote{IDPrefix: "\"", IDSuffix: "\""}}
 		filter        = Filter{}
 		updateBuilder = Update{
 			BufferFactory: bufferFactory,
@@ -62,7 +62,7 @@ func TestUpdate_Build_ordinal(t *testing.T) {
 
 func TestUpdate_Build_incDecAndFragment(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		updateBuilder = Update{
 			BufferFactory: bufferFactory,
