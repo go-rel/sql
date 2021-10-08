@@ -10,7 +10,7 @@ import (
 
 func TestFilter_Write(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", EscapePrefix: "`", EscapeSuffix: "`"}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filterBuilder = Filter{}
 		queryBuilder  = Query{BufferFactory: bufferFactory, Filter: filterBuilder}
 	)
@@ -186,7 +186,7 @@ func TestFilter_Write(t *testing.T) {
 
 func TestFilter_Write_ordinal(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, EscapePrefix: "\"", EscapeSuffix: "\""}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: &SqlQuoter{IDPrefix: "\"", IDSuffix: "\""}}
 		filterBuilder = Filter{}
 		queryBuilder  = Query{BufferFactory: bufferFactory, Filter: filterBuilder}
 	)

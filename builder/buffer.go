@@ -13,25 +13,28 @@ var escapeCache sync.Map
 
 type escapeCacheKey struct {
 	value  string
-	prefix string
-	suffix string
+	quoter Quoter
 }
 
 // Buffer is used to build query string.
 type Buffer struct {
 	strings.Builder
+	Quoter              Quoter
 	ArgumentPlaceholder string
 	ArgumentOrdinal     bool
-	EscapePrefix        string
-	EscapeSuffix        string
+	InlineValues        bool
 	valueCount          int
 	arguments           []interface{}
 }
 
 // WriteValue query placeholder and append value to argument.
 func (b *Buffer) WriteValue(value interface{}) {
-	b.WritePlaceholder()
-	b.arguments = append(b.arguments, value)
+	if !b.InlineValues {
+		b.WritePlaceholder()
+		b.arguments = append(b.arguments, value)
+		return
+	}
+
 }
 
 // WritePlaceholder without adding argument.
@@ -50,11 +53,11 @@ func (b *Buffer) WriteEscape(value string) {
 }
 
 func (b Buffer) escape(value string) string {
-	if b.EscapePrefix == "" && b.EscapeSuffix == "" || value == "*" {
+	if value == "*" {
 		return value
 	}
 
-	key := escapeCacheKey{value: value, prefix: b.EscapePrefix, suffix: b.EscapeSuffix}
+	key := escapeCacheKey{value: value, quoter: b.Quoter}
 	escapedValue, ok := escapeCache.Load(key)
 	if ok {
 		return escapedValue.(string)
@@ -66,12 +69,16 @@ func (b Buffer) escape(value string) string {
 		escapedValue = b.escape(value[:i]) + " AS " + b.escape(value[i+4:])
 	} else if start, end := strings.IndexRune(value, '('), strings.IndexRune(value, ')'); start >= 0 && end >= 0 && end > start {
 		escapedValue = value[:start+1] + b.escape(value[start+1:end]) + value[end:]
-	} else if strings.HasSuffix(value, "*") {
-		escapedValue = b.EscapePrefix + strings.Replace(value, ".", b.EscapeSuffix+".", 1)
 	} else {
-		escapedValue = b.EscapePrefix +
-			strings.Replace(value, ".", b.EscapeSuffix+"."+b.EscapePrefix, 1) +
-			b.EscapeSuffix
+		parts := strings.Split(value, ".")
+		for i, part := range parts {
+			part = strings.TrimSpace(part)
+			if part == "*" && i == len(parts)-1 {
+				break
+			}
+			parts[i] = b.Quoter.ID(part)
+		}
+		escapedValue = strings.Join(parts, ".")
 	}
 
 	escapeCache.Store(key, escapedValue)
@@ -100,17 +107,17 @@ func (b *Buffer) Reset() {
 
 // BufferFactory is used to create buffer based on shared settings.
 type BufferFactory struct {
+	Quoter              Quoter
 	ArgumentPlaceholder string
 	ArgumentOrdinal     bool
-	EscapePrefix        string
-	EscapeSuffix        string
+	InlineValues        bool
 }
 
 func (bf BufferFactory) Create() Buffer {
 	return Buffer{
+		Quoter:              bf.Quoter,
 		ArgumentPlaceholder: bf.ArgumentPlaceholder,
 		ArgumentOrdinal:     bf.ArgumentOrdinal,
-		EscapePrefix:        bf.EscapePrefix,
-		EscapeSuffix:        bf.EscapeSuffix,
+		InlineValues:        bf.InlineValues,
 	}
 }

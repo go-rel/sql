@@ -7,7 +7,7 @@ import (
 )
 
 func TestBuffer_escape(t *testing.T) {
-	buffer := Buffer{EscapePrefix: "[", EscapeSuffix: "]"}
+	buffer := Buffer{Quoter: &SqlQuoter{IDPrefix: "[", IDSuffix: "]"}}
 
 	tests := []struct {
 		field  string
@@ -47,7 +47,7 @@ func TestBuffer_escape(t *testing.T) {
 
 func TestBuffer_Arguments(t *testing.T) {
 	var (
-		buffer           = Buffer{EscapePrefix: "[", EscapeSuffix: "]"}
+		buffer           = Buffer{Quoter: &SqlQuoter{IDPrefix: "[", IDSuffix: "]"}}
 		initialArguments = []interface{}{1}
 	)
 
