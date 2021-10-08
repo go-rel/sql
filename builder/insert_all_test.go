@@ -10,7 +10,7 @@ import (
 func BenchmarkInsertAll_Build(b *testing.B) {
 	var (
 		insertAllBuilder = InsertAll{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 		}
 		bulkMutates = []map[string]rel.Mutate{
 			{
@@ -34,7 +34,7 @@ func BenchmarkInsertAll_Build(b *testing.B) {
 func TestInsertAll_Build(t *testing.T) {
 	var (
 		insertAllBuilder = InsertAll{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 		}
 		bulkMutates = []map[string]rel.Mutate{
 			{
@@ -63,7 +63,7 @@ func TestInsertAll_Build(t *testing.T) {
 func TestInsertAll_Build_ordinal(t *testing.T) {
 	var (
 		insertAllBuilder = InsertAll{
-			BufferFactory:         BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: &SqlQuoter{IDPrefix: "\"", IDSuffix: "\""}},
+			BufferFactory:         BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: &Quote{IDPrefix: "\"", IDSuffix: "\""}},
 			ReturningPrimaryValue: true,
 		}
 		bulkMutates = []map[string]rel.Mutate{

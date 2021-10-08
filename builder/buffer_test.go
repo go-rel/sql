@@ -8,7 +8,7 @@ import (
 )
 
 func TestBuffer_escape(t *testing.T) {
-	buffer := Buffer{Quoter: &SqlQuoter{IDPrefix: "[", IDSuffix: "]"}}
+	buffer := Buffer{Quoter: &Quote{IDPrefix: "[", IDSuffix: "]"}}
 
 	tests := []struct {
 		field  string
@@ -48,7 +48,7 @@ func TestBuffer_escape(t *testing.T) {
 
 func TestBuffer_Arguments(t *testing.T) {
 	var (
-		buffer           = Buffer{Quoter: &SqlQuoter{IDPrefix: "[", IDSuffix: "]"}}
+		buffer           = Buffer{Quoter: &Quote{IDPrefix: "[", IDSuffix: "]"}}
 		initialArguments = []interface{}{1}
 	)
 
@@ -81,7 +81,7 @@ func (c customValuerType) Value() (driver.Value, error) {
 }
 
 func TestBuffer_InlineValue(t *testing.T) {
-	bf := BufferFactory{InlineValues: true, BoolTrueValue: "1", BoolFalseValue: "0", Quoter: &SqlQuoter{ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+	bf := BufferFactory{InlineValues: true, BoolTrueValue: "1", BoolFalseValue: "0", Quoter: &Quote{ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 
 	tests := []struct {
 		value  interface{}

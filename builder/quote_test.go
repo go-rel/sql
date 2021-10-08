@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSqlQuoter_ID(t *testing.T) {
-	quoter := &SqlQuoter{IDPrefix: "[", IDSuffix: "]", IDSuffixEscapeChar: "]"}
+func TestQuote_ID(t *testing.T) {
+	quoter := &Quote{IDPrefix: "[", IDSuffix: "]", IDSuffixEscapeChar: "]"}
 
 	tests := []struct {
 		field  string
@@ -33,8 +33,8 @@ func TestSqlQuoter_ID(t *testing.T) {
 	}
 }
 
-func TestSqlQuoter_Value(t *testing.T) {
-	quoter := &SqlQuoter{ValueQuote: "'", ValueQuoteEscapeChar: "'"}
+func TestQuote_Value(t *testing.T) {
+	quoter := &Quote{ValueQuote: "'", ValueQuoteEscapeChar: "'"}
 
 	tests := []struct {
 		value  interface{}

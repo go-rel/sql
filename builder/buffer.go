@@ -44,12 +44,12 @@ func (b *Buffer) WriteValue(value interface{}) {
 
 	// Detect float bits to not lose precision after converting to float64
 	var floatBits = 64
-	if reflect.ValueOf(value).Kind() == reflect.Float32 {
+	if value != nil && reflect.TypeOf(value).Kind() == reflect.Float32 {
 		floatBits = 32
 	}
 
 	if v, err := b.ValueConverter.ConvertValue(value); err != nil {
-		log.Printf("[WARN] unsupported inline value %v", value)
+		log.Printf("[WARN] unsupported inline value %v: %v", value, err)
 	} else {
 		value = v
 	}

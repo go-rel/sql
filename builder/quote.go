@@ -19,8 +19,8 @@ type Quoter interface {
 	Value(v interface{}) string
 }
 
-// SqlQuoter is default implementation of Quoter interface.
-type SqlQuoter struct {
+// Quote is default implementation of Quoter interface.
+type Quote struct {
 	IDPrefix             string
 	IDSuffix             string
 	IDSuffixEscapeChar   string
@@ -28,11 +28,11 @@ type SqlQuoter struct {
 	ValueQuoteEscapeChar string
 }
 
-func (q *SqlQuoter) ID(name string) string {
+func (q *Quote) ID(name string) string {
 	return q.IDPrefix + strings.Replace(name, q.IDSuffix, q.IDSuffixEscapeChar+q.IDSuffix, -1) + q.IDSuffix
 }
 
-func (q *SqlQuoter) Value(v interface{}) string {
+func (q *Quote) Value(v interface{}) string {
 	switch v := v.(type) {
 	default:
 		panic("unsupported value")
