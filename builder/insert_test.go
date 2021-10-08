@@ -11,7 +11,7 @@ import (
 func BenchmarkInsert_Build(b *testing.B) {
 	var (
 		insertBuilder = Insert{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 		}
 		mutates = map[string]rel.Mutate{
 			"name":  rel.Set("name", "foo"),
@@ -28,7 +28,7 @@ func BenchmarkInsert_Build(b *testing.B) {
 func TestInsert_Build(t *testing.T) {
 	var (
 		insertBuilder = Insert{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 		}
 		mutates = map[string]rel.Mutate{
 			"name":  rel.Set("name", "foo"),
@@ -48,7 +48,7 @@ func TestInsert_Build(t *testing.T) {
 func TestInsert_Build_ordinal(t *testing.T) {
 	var (
 		insertBuilder = Insert{
-			BufferFactory:         BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: &Quote{IDPrefix: "\"", IDSuffix: "\""}},
+			BufferFactory:         BufferFactory{ArgumentPlaceholder: "$", ArgumentOrdinal: true, Quoter: Quote{IDPrefix: "\"", IDSuffix: "\""}},
 			InsertDefaultValues:   true,
 			ReturningPrimaryValue: true,
 		}
@@ -70,7 +70,7 @@ func TestInsert_Build_ordinal(t *testing.T) {
 func TestInsert_Build_defaultValuesDisabled(t *testing.T) {
 	var (
 		insertBuilder = Insert{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 		}
 		mutates  = map[string]rel.Mutate{}
 		qs, args = insertBuilder.Build("users", "id", mutates)
@@ -83,7 +83,7 @@ func TestInsert_Build_defaultValuesDisabled(t *testing.T) {
 func TestInsert_Build_defaultValuesEnabled(t *testing.T) {
 	var (
 		insertBuilder = Insert{
-			BufferFactory:         BufferFactory{ArgumentPlaceholder: "?", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			BufferFactory:         BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 			ReturningPrimaryValue: true,
 			InsertDefaultValues:   true,
 		}

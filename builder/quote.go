@@ -28,11 +28,11 @@ type Quote struct {
 	ValueQuoteEscapeChar string
 }
 
-func (q *Quote) ID(name string) string {
+func (q Quote) ID(name string) string {
 	return q.IDPrefix + strings.Replace(name, q.IDSuffix, q.IDSuffixEscapeChar+q.IDSuffix, -1) + q.IDSuffix
 }
 
-func (q *Quote) Value(v interface{}) string {
+func (q Quote) Value(v interface{}) string {
 	switch v := v.(type) {
 	default:
 		panic("unsupported value")

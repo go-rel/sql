@@ -12,7 +12,7 @@ import (
 func TestTable_Build(t *testing.T) {
 	var (
 		tableBuilder = Table{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 			ColumnMapper:  sql.ColumnMapper,
 		}
 	)

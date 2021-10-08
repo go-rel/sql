@@ -7,7 +7,7 @@ import (
 )
 
 func TestQuote_ID(t *testing.T) {
-	quoter := &Quote{IDPrefix: "[", IDSuffix: "]", IDSuffixEscapeChar: "]"}
+	quoter := Quote{IDPrefix: "[", IDSuffix: "]", IDSuffixEscapeChar: "]"}
 
 	tests := []struct {
 		field  string
@@ -34,7 +34,7 @@ func TestQuote_ID(t *testing.T) {
 }
 
 func TestQuote_Value(t *testing.T) {
-	quoter := &Quote{ValueQuote: "'", ValueQuoteEscapeChar: "'"}
+	quoter := Quote{ValueQuote: "'", ValueQuoteEscapeChar: "'"}
 
 	tests := []struct {
 		value  interface{}

@@ -9,7 +9,7 @@ import (
 
 func TestIndex_Build(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		indexBuilder  = Index{
 			BufferFactory:    bufferFactory,
@@ -131,7 +131,7 @@ func TestIndex_Build(t *testing.T) {
 
 func TestIndex_BuildWithUnsupportedPartial(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, Quoter: &Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		indexBuilder  = Index{
 			BufferFactory:    bufferFactory,
