@@ -40,6 +40,12 @@ func (b *Buffer) WriteValue(value interface{}) {
 		return
 	}
 
+	// Detect float bits to not lose precision after converting to float64
+	var floatBits = 64
+	if reflect.ValueOf(value).Kind() == reflect.Float32 {
+		floatBits = 32
+	}
+
 	if b.ValueConverter != nil {
 		if v, err := b.ValueConverter.ConvertValue(value); err != nil {
 			log.Printf("[WARN] unsupported inline value %v", value)
@@ -66,11 +72,8 @@ func (b *Buffer) WriteValue(value interface{}) {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		b.WriteString(strconv.FormatUint(rv.Uint(), 10))
 		return
-	case reflect.Float64:
-		b.WriteString(strconv.FormatFloat(rv.Float(), 'g', -1, 64))
-		return
-	case reflect.Float32:
-		b.WriteString(strconv.FormatFloat(rv.Float(), 'g', -1, 32))
+	case reflect.Float32, reflect.Float64:
+		b.WriteString(strconv.FormatFloat(rv.Float(), 'g', -1, floatBits))
 		return
 	case reflect.Bool:
 		b.WriteString(strconv.FormatBool(rv.Bool()))

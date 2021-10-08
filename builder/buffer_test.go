@@ -62,3 +62,41 @@ func TestBuffer_Arguments(t *testing.T) {
 	buffer.Reset()
 	assert.Nil(t, buffer.Arguments())
 }
+
+func TestBuffer_InlineValue(t *testing.T) {
+	bf := BufferFactory{InlineValues: true, Quoter: &SqlQuoter{ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+
+	tests := []struct {
+		value  interface{}
+		result string
+	}{
+		{
+			value:  true,
+			result: "true",
+		},
+		{
+			value:  122,
+			result: "122",
+		},
+		{
+			value:  float32(1.24),
+			result: "1.24",
+		},
+		{
+			value:  float64(1.23),
+			result: "1.23",
+		},
+		{
+			value:  uint(123),
+			result: "123",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.result, func(t *testing.T) {
+			buffer := bf.Create()
+			buffer.WriteValue(test.value)
+
+			assert.Equal(t, test.result, buffer.String())
+		})
+	}
+}
