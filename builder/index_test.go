@@ -9,7 +9,7 @@ import (
 
 func TestIndex_Build(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		indexBuilder  = Index{
 			BufferFactory:    bufferFactory,
@@ -85,6 +85,21 @@ func TestIndex_Build(t *testing.T) {
 					Type:  rel.FilterEqOp,
 					Field: "deleted",
 					Value: false,
+				},
+			},
+		},
+		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `table` (`column1`) WHERE `status`='test''s status';",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
+				Filter: rel.FilterQuery{
+					Type:  rel.FilterEqOp,
+					Field: "status",
+					Value: "test's status",
 				},
 			},
 		},

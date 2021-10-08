@@ -1,6 +1,10 @@
 package builder
 
 import (
+	"database/sql/driver"
+	"fmt"
+	"log"
+	"reflect"
 	"strconv"
 	"strings"
 	"sync"
@@ -20,6 +24,7 @@ type escapeCacheKey struct {
 type Buffer struct {
 	strings.Builder
 	Quoter              Quoter
+	ValueConverter      driver.ValueConverter
 	ArgumentPlaceholder string
 	ArgumentOrdinal     bool
 	InlineValues        bool
@@ -35,6 +40,43 @@ func (b *Buffer) WriteValue(value interface{}) {
 		return
 	}
 
+	if b.ValueConverter != nil {
+		if v, err := b.ValueConverter.ConvertValue(value); err != nil {
+			log.Printf("[WARN] unsupported inline value %v", value)
+			return
+		} else {
+			value = v
+		}
+	}
+
+	switch v := value.(type) {
+	case string:
+		b.WriteString(b.Quoter.Value(v))
+		return
+	case []byte:
+		b.WriteString(b.Quoter.Value(string(v)))
+		return
+	}
+
+	rv := reflect.ValueOf(value)
+	switch rv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		b.WriteString(strconv.FormatInt(rv.Int(), 10))
+		return
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		b.WriteString(strconv.FormatUint(rv.Uint(), 10))
+		return
+	case reflect.Float64:
+		b.WriteString(strconv.FormatFloat(rv.Float(), 'g', -1, 64))
+		return
+	case reflect.Float32:
+		b.WriteString(strconv.FormatFloat(rv.Float(), 'g', -1, 32))
+		return
+	case reflect.Bool:
+		b.WriteString(strconv.FormatBool(rv.Bool()))
+		return
+	}
+	b.WriteString(fmt.Sprintf("%v", value))
 }
 
 // WritePlaceholder without adding argument.
@@ -108,14 +150,20 @@ func (b *Buffer) Reset() {
 // BufferFactory is used to create buffer based on shared settings.
 type BufferFactory struct {
 	Quoter              Quoter
+	ValueConverter      driver.ValueConverter
 	ArgumentPlaceholder string
 	ArgumentOrdinal     bool
 	InlineValues        bool
 }
 
 func (bf BufferFactory) Create() Buffer {
+	conv := bf.ValueConverter
+	if conv == nil {
+		conv = driver.DefaultParameterConverter
+	}
 	return Buffer{
 		Quoter:              bf.Quoter,
+		ValueConverter:      conv,
 		ArgumentPlaceholder: bf.ArgumentPlaceholder,
 		ArgumentOrdinal:     bf.ArgumentOrdinal,
 		InlineValues:        bf.InlineValues,

@@ -1,6 +1,8 @@
 package builder
 
-import "strings"
+import (
+	"strings"
+)
 
 // Quoter returns safe and valid SQL strings to use when building a SQL text.
 type Quoter interface {
