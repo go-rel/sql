@@ -81,7 +81,7 @@ func (c customValuerType) Value() (driver.Value, error) {
 }
 
 func TestBuffer_InlineValue(t *testing.T) {
-	bf := BufferFactory{InlineValues: true, Quoter: &SqlQuoter{ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+	bf := BufferFactory{InlineValues: true, BoolTrueValue: "1", BoolFalseValue: "0", Quoter: &SqlQuoter{ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 
 	tests := []struct {
 		value  interface{}
@@ -89,7 +89,15 @@ func TestBuffer_InlineValue(t *testing.T) {
 	}{
 		{
 			value:  true,
-			result: "true",
+			result: "1",
+		},
+		{
+			value:  false,
+			result: "0",
+		},
+		{
+			value:  nil,
+			result: "NULL",
 		},
 		{
 			value:  122,

@@ -28,6 +28,8 @@ type Buffer struct {
 	ArgumentPlaceholder string
 	ArgumentOrdinal     bool
 	InlineValues        bool
+	BoolTrueValue       string
+	BoolFalseValue      string
 	valueCount          int
 	arguments           []interface{}
 }
@@ -37,6 +39,11 @@ func (b *Buffer) WriteValue(value interface{}) {
 	if !b.InlineValues {
 		b.WritePlaceholder()
 		b.arguments = append(b.arguments, value)
+		return
+	}
+
+	if value == nil {
+		b.WriteString("NULL")
 		return
 	}
 
@@ -70,7 +77,11 @@ func (b *Buffer) WriteValue(value interface{}) {
 		b.WriteString(strconv.FormatFloat(rv.Float(), 'g', -1, floatBits))
 		return
 	case reflect.Bool:
-		b.WriteString(strconv.FormatBool(rv.Bool()))
+		if rv.Bool() {
+			b.WriteString(b.BoolTrueValue)
+		} else {
+			b.WriteString(b.BoolFalseValue)
+		}
 		return
 	}
 	b.WriteString(fmt.Sprintf("%v", value))
@@ -151,6 +162,8 @@ type BufferFactory struct {
 	ArgumentPlaceholder string
 	ArgumentOrdinal     bool
 	InlineValues        bool
+	BoolTrueValue       string
+	BoolFalseValue      string
 }
 
 func (bf BufferFactory) Create() Buffer {
@@ -164,5 +177,7 @@ func (bf BufferFactory) Create() Buffer {
 		ArgumentPlaceholder: bf.ArgumentPlaceholder,
 		ArgumentOrdinal:     bf.ArgumentOrdinal,
 		InlineValues:        bf.InlineValues,
+		BoolTrueValue:       bf.BoolTrueValue,
+		BoolFalseValue:      bf.BoolFalseValue,
 	}
 }

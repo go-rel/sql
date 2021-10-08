@@ -9,7 +9,7 @@ import (
 
 func TestIndex_Build(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		indexBuilder  = Index{
 			BufferFactory:    bufferFactory,
