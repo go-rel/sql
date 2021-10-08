@@ -128,3 +128,43 @@ func TestIndex_Build(t *testing.T) {
 		})
 	}
 }
+
+func TestIndex_BuildWithUnsupportedPartial(t *testing.T) {
+	var (
+		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, Quoter: &SqlQuoter{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		filter        = Filter{}
+		indexBuilder  = Index{
+			BufferFactory:    bufferFactory,
+			Query:            Query{BufferFactory: bufferFactory, Filter: filter},
+			Filter:           filter,
+			DropIndexOnTable: true,
+		}
+	)
+
+	tests := []struct {
+		result string
+		index  rel.Index
+	}{
+		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `table` (`column1`);",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
+				Filter: rel.FilterQuery{
+					Type:  rel.FilterEqOp,
+					Field: "deleted",
+					Value: false,
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.result, func(t *testing.T) {
+			assert.Equal(t, test.result, indexBuilder.Build(test.index))
+		})
+	}
+}
