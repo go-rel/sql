@@ -46,13 +46,10 @@ func (b *Buffer) WriteValue(value interface{}) {
 		floatBits = 32
 	}
 
-	if b.ValueConverter != nil {
-		if v, err := b.ValueConverter.ConvertValue(value); err != nil {
-			log.Printf("[WARN] unsupported inline value %v", value)
-			return
-		} else {
-			value = v
-		}
+	if v, err := b.ValueConverter.ConvertValue(value); err != nil {
+		log.Printf("[WARN] unsupported inline value %v", value)
+	} else {
+		value = v
 	}
 
 	switch v := value.(type) {
@@ -68,9 +65,6 @@ func (b *Buffer) WriteValue(value interface{}) {
 	switch rv.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		b.WriteString(strconv.FormatInt(rv.Int(), 10))
-		return
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		b.WriteString(strconv.FormatUint(rv.Uint(), 10))
 		return
 	case reflect.Float32, reflect.Float64:
 		b.WriteString(strconv.FormatFloat(rv.Float(), 'g', -1, floatBits))

@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"database/sql/driver"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -63,6 +64,22 @@ func TestBuffer_Arguments(t *testing.T) {
 	assert.Nil(t, buffer.Arguments())
 }
 
+type customType struct {
+	val string
+}
+
+func (c customType) String() string {
+	return c.val
+}
+
+type customValuerType struct {
+	val string
+}
+
+func (c customValuerType) Value() (driver.Value, error) {
+	return c.val, nil
+}
+
 func TestBuffer_InlineValue(t *testing.T) {
 	bf := BufferFactory{InlineValues: true, Quoter: &SqlQuoter{ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 
@@ -87,8 +104,28 @@ func TestBuffer_InlineValue(t *testing.T) {
 			result: "1.23",
 		},
 		{
-			value:  uint(123),
+			value:  uint64(123),
 			result: "123",
+		},
+		{
+			value:  "Test",
+			result: "'Test'",
+		},
+		{
+			value:  "Test's",
+			result: "'Test''s'",
+		},
+		{
+			value:  []byte("Test's"),
+			result: "'Test''s'",
+		},
+		{
+			value:  customType{"test"},
+			result: "test",
+		},
+		{
+			value:  customValuerType{"test"},
+			result: "'test'",
 		},
 	}
 	for _, test := range tests {
