@@ -42,11 +42,6 @@ func (b *Buffer) WriteValue(value interface{}) {
 		return
 	}
 
-	if value == nil {
-		b.WriteString("NULL")
-		return
-	}
-
 	// Detect float bits to not lose precision after converting to float64
 	var floatBits = 64
 	if reflect.ValueOf(value).Kind() == reflect.Float32 {
@@ -57,6 +52,11 @@ func (b *Buffer) WriteValue(value interface{}) {
 		log.Printf("[WARN] unsupported inline value %v", value)
 	} else {
 		value = v
+	}
+
+	if value == nil {
+		b.WriteString("NULL")
+		return
 	}
 
 	switch v := value.(type) {
