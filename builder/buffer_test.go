@@ -3,6 +3,7 @@ package builder
 import (
 	"database/sql/driver"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -126,6 +127,10 @@ func TestBuffer_InlineValue(t *testing.T) {
 		{
 			value:  []byte("Test's"),
 			result: "'Test''s'",
+		},
+		{
+			value:  time.Unix(1633934368, 0).UTC(),
+			result: "'2021-10-11 06:39:28'",
 		},
 		{
 			value:  customType{"test"},

@@ -7,12 +7,15 @@ import (
 	"github.com/go-rel/rel"
 )
 
+// DefaultTimeLayout default time layout.
+const DefaultTimeLayout = "2006-01-02 15:04:05"
+
 // ColumnMapper function.
 func ColumnMapper(column *rel.Column) (string, int, int) {
 	var (
 		typ        string
 		m, n       int
-		timeLayout = "2006-01-02 15:04:05"
+		timeLayout = DefaultTimeLayout
 	)
 
 	switch column.Type {
