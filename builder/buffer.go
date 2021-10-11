@@ -8,6 +8,9 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/go-rel/sql"
 )
 
 // UnescapeCharacter disable field escaping when it starts with this character.
@@ -65,6 +68,9 @@ func (b *Buffer) WriteValue(value interface{}) {
 		return
 	case []byte:
 		b.WriteString(b.Quoter.Value(string(v)))
+		return
+	case time.Time:
+		b.WriteString(b.Quoter.Value(v.Format(sql.DefaultTimeLayout)))
 		return
 	}
 

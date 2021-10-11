@@ -43,7 +43,9 @@ func (f Filter) Write(buffer *Buffer, filter rel.FilterQuery, queryWriter QueryW
 		buffer.WriteValue(filter.Value)
 	case rel.FilterFragmentOp:
 		buffer.WriteString(filter.Field)
-		buffer.AddArguments(filter.Value.([]interface{})...)
+		if !buffer.InlineValues {
+			buffer.AddArguments(filter.Value.([]interface{})...)
+		}
 	}
 }
 
