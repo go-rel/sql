@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -15,10 +16,12 @@ import (
 
 // UnescapeCharacter disable field escaping when it starts with this character.
 var UnescapeCharacter byte = '^'
+var regexNumber = regexp.MustCompile(`^\d+$`)
 
 var escapeCache sync.Map
 
 type escapeCacheKey struct {
+	table  string
 	value  string
 	quoter Quoter
 }
@@ -103,17 +106,25 @@ func (b *Buffer) WritePlaceholder() {
 	}
 }
 
-// WriteEscape string.
-func (b *Buffer) WriteEscape(value string) {
-	b.WriteString(b.escape(value))
+// WriteField writes table and field name.
+func (b *Buffer) WriteField(table, field string) {
+	b.WriteString(b.escape(table, field))
 }
 
-func (b Buffer) escape(value string) string {
+// WriteEscape string.
+func (b *Buffer) WriteEscape(value string) {
+	b.WriteString(b.escape("", value))
+}
+
+func (b Buffer) escape(table, value string) string {
 	if value == "*" {
-		return value
+		if table == "" {
+			return value
+		}
+		return b.Quoter.ID(table) + ".*"
 	}
 
-	key := escapeCacheKey{value: value, quoter: b.Quoter}
+	key := escapeCacheKey{table: table, value: value, quoter: b.Quoter}
 	escapedValue, ok := escapeCache.Load(key)
 	if ok {
 		return escapedValue.(string)
@@ -121,12 +132,17 @@ func (b Buffer) escape(value string) string {
 
 	if len(value) > 0 && value[0] == UnescapeCharacter {
 		escapedValue = value[1:]
+	} else if regexNumber.MatchString(value) {
+		escapedValue = value
 	} else if i := strings.Index(strings.ToLower(value), " as "); i > -1 {
-		escapedValue = b.escape(value[:i]) + " AS " + b.escape(value[i+4:])
+		escapedValue = b.escape(table, value[:i]) + " AS " + b.escape("", value[i+4:])
 	} else if start, end := strings.IndexRune(value, '('), strings.IndexRune(value, ')'); start >= 0 && end >= 0 && end > start {
-		escapedValue = value[:start+1] + b.escape(value[start+1:end]) + value[end:]
+		escapedValue = value[:start+1] + b.escape(table, value[start+1:end]) + value[end:]
 	} else {
 		parts := strings.Split(value, ".")
+		if len(parts) == 1 && table != "" {
+			parts = []string{table, parts[0]}
+		}
 		for i, part := range parts {
 			part = strings.TrimSpace(part)
 			if part == "*" && i == len(parts)-1 {

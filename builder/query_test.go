@@ -45,7 +45,7 @@ func TestQuery_Build(t *testing.T) {
 		query  rel.Query
 	}{
 		{
-			result: "SELECT * FROM `users`;",
+			result: "SELECT `users`.* FROM `users`;",
 			query:  query,
 		},
 		{
@@ -53,45 +53,49 @@ func TestQuery_Build(t *testing.T) {
 			query:  query.Select("users.*"),
 		},
 		{
-			result: "SELECT `id`,`name` FROM `users`;",
+			result: "SELECT `users`.`id`,`users`.`name` FROM `users`;",
 			query:  query.Select("id", "name"),
 		},
 		{
-			result: "SELECT `id`,FIELD(`gender`, \"male\") AS `order` FROM `users` ORDER BY `order` ASC;",
-			query:  query.Select("id", "^FIELD(`gender`, \"male\") AS `order`").SortAsc("order"),
+			result: "SELECT `users`.`id`,FIELD(`gender`, \"male\") AS `order` FROM `users` ORDER BY order ASC;",
+			query:  query.Select("id", "^FIELD(`gender`, \"male\") AS `order`").SortAsc("^order"),
 		},
 		{
-			result: "SELECT * FROM `users` JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id`;",
+			result: "SELECT `users`.`id`,FIELD(`gender`, \"male\") AS `order` FROM `users` ORDER BY 2 ASC;",
+			query:  query.Select("id", "^FIELD(`gender`, \"male\") AS `order`").SortAsc("2"),
+		},
+		{
+			result: "SELECT `users`.* FROM `users` JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id`;",
 			query:  query.JoinOn("transactions", "transactions.id", "users.transaction_id"),
 		},
 		{
-			result: "SELECT * FROM `users` WHERE `id`=?;",
+			result: "SELECT `users`.* FROM `users` WHERE `users`.`id`=?;",
 			args:   []interface{}{10},
 			query:  query.Where(where.Eq("id", 10)),
 		},
 		{
-			result: "SELECT DISTINCT * FROM `users` GROUP BY `type` HAVING `price`>?;",
+			result: "SELECT DISTINCT `users`.* FROM `users` GROUP BY `users`.`type` HAVING `users`.`price`>?;",
 			args:   []interface{}{1000},
 			query:  query.Distinct().Group("type").Having(where.Gt("price", 1000)),
 		},
 		{
-			result: "SELECT * FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id`;",
+			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id`;",
 			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id"),
 		},
 		{
-			result: "SELECT * FROM `users` ORDER BY `created_at` ASC;",
+			result: "SELECT `users`.* FROM `users` ORDER BY `users`.`created_at` ASC;",
 			query:  query.SortAsc("created_at"),
 		},
 		{
-			result: "SELECT * FROM `users` ORDER BY `created_at` ASC, `id` DESC;",
+			result: "SELECT `users`.* FROM `users` ORDER BY `users`.`created_at` ASC, `users`.`id` DESC;",
 			query:  query.SortAsc("created_at").SortDesc("id"),
 		},
 		{
-			result: "SELECT * FROM `users` LIMIT 10 OFFSET 10;",
+			result: "SELECT `users`.* FROM `users` LIMIT 10 OFFSET 10;",
 			query:  query.Offset(10).Limit(10),
 		},
 		{
-			result: "SELECT * FROM `users` FOR UPDATE;",
+			result: "SELECT `users`.* FROM `users` FOR UPDATE;",
 			query:  rel.From("users").Lock("FOR UPDATE"),
 		},
 	}
@@ -123,7 +127,7 @@ func TestQuery_Build_ordinal(t *testing.T) {
 		query  rel.Query
 	}{
 		{
-			result: "SELECT * FROM \"users\";",
+			result: "SELECT \"users\".* FROM \"users\";",
 			query:  query,
 		},
 		{
@@ -131,49 +135,49 @@ func TestQuery_Build_ordinal(t *testing.T) {
 			query:  query.Select("users.*"),
 		},
 		{
-			result: "SELECT \"id\",\"name\" FROM \"users\";",
+			result: "SELECT \"users\".\"id\",\"users\".\"name\" FROM \"users\";",
 			query:  query.Select("id", "name"),
 		},
 		{
-			result: "SELECT \"id\" AS \"user_id\",\"name\" FROM \"users\";",
+			result: "SELECT \"users\".\"id\" AS \"user_id\",\"users\".\"name\" FROM \"users\";",
 			query:  query.Select("id as user_id", "name"),
 		},
 		{
-			result: "SELECT \"id\" AS \"user_id\",\"name\" FROM \"users\";",
+			result: "SELECT \"users\".\"id\" AS \"user_id\",\"users\".\"name\" FROM \"users\";",
 			query:  query.Select("id AS user_id", "name"),
 		},
 		{
-			result: "SELECT * FROM \"users\" JOIN \"transactions\" ON \"transactions\".\"id\"=\"users\".\"transaction_id\";",
+			result: "SELECT \"users\".* FROM \"users\" JOIN \"transactions\" ON \"transactions\".\"id\"=\"users\".\"transaction_id\";",
 			query:  query.JoinOn("transactions", "transactions.id", "users.transaction_id"),
 		},
 		{
-			result: "SELECT * FROM \"users\" WHERE \"id\"=$1;",
+			result: "SELECT \"users\".* FROM \"users\" WHERE \"users\".\"id\"=$1;",
 			args:   []interface{}{10},
 			query:  query.Where(where.Eq("id", 10)),
 		},
 		{
-			result: "SELECT DISTINCT * FROM \"users\" GROUP BY \"type\" HAVING \"price\">$1;",
+			result: "SELECT DISTINCT \"users\".* FROM \"users\" GROUP BY \"users\".\"type\" HAVING \"users\".\"price\">$1;",
 			args:   []interface{}{1000},
 			query:  query.Distinct().Group("type").Having(where.Gt("price", 1000)),
 		},
 		{
-			result: "SELECT * FROM \"users\" JOIN \"transactions\" ON \"transactions\".\"id\"=\"users\".\"transaction_id\";",
+			result: "SELECT \"users\".* FROM \"users\" JOIN \"transactions\" ON \"transactions\".\"id\"=\"users\".\"transaction_id\";",
 			query:  query.JoinOn("transactions", "transactions.id", "users.transaction_id"),
 		},
 		{
-			result: "SELECT * FROM \"users\" ORDER BY \"created_at\" ASC;",
+			result: "SELECT \"users\".* FROM \"users\" ORDER BY \"users\".\"created_at\" ASC;",
 			query:  query.SortAsc("created_at"),
 		},
 		{
-			result: "SELECT * FROM \"users\" ORDER BY \"created_at\" ASC, \"id\" DESC;",
+			result: "SELECT \"users\".* FROM \"users\" ORDER BY \"users\".\"created_at\" ASC, \"users\".\"id\" DESC;",
 			query:  query.SortAsc("created_at").SortDesc("id"),
 		},
 		{
-			result: "SELECT * FROM \"users\" LIMIT 10 OFFSET 10;",
+			result: "SELECT \"users\".* FROM \"users\" LIMIT 10 OFFSET 10;",
 			query:  query.Offset(10).Limit(10),
 		},
 		{
-			result: "SELECT * FROM \"users\" FOR UPDATE;",
+			result: "SELECT \"users\".* FROM \"users\" FOR UPDATE;",
 			query:  rel.From("users").Lock("FOR UPDATE"),
 		},
 	}
@@ -211,6 +215,7 @@ func TestQuery_WriteSelect(t *testing.T) {
 	)
 
 	tests := []struct {
+		table       string
 		result      string
 		selectQuery rel.SelectQuery
 	}{
@@ -245,6 +250,11 @@ func TestQuery_WriteSelect(t *testing.T) {
 			result:      "SELECT SUM(`transactions`.`total`) AS `total`",
 			selectQuery: rel.SelectQuery{Fields: []string{"SUM(transactions.total) AS total"}},
 		},
+		{
+			table:       "transactions",
+			result:      "SELECT `transactions`.*",
+			selectQuery: rel.SelectQuery{Fields: []string{"*"}},
+		},
 	}
 
 	for _, test := range tests {
@@ -253,7 +263,7 @@ func TestQuery_WriteSelect(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			queryBuilder.WriteSelect(&buffer, test.selectQuery)
+			queryBuilder.WriteSelect(&buffer, test.table, test.selectQuery)
 			assert.Equal(t, test.result, buffer.String())
 		})
 	}
@@ -325,6 +335,7 @@ func TestQuery_WriteWhere(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
@@ -345,7 +356,7 @@ func TestQuery_WriteWhere(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			queryBuilder.WriteWhere(&buffer, test.filter)
+			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
@@ -362,6 +373,7 @@ func TestQuery_WriteWhere_ordinal(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
@@ -382,7 +394,7 @@ func TestQuery_WriteWhere_ordinal(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			queryBuilder.WriteWhere(&buffer, test.filter)
+			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
@@ -399,24 +411,25 @@ func TestQuery_WriteWhere_SubQuery(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
-			result: " WHERE `field`=ANY(SELECT `field1` FROM `table2` WHERE `type`=?)",
+			result: " WHERE `field`=ANY(SELECT `table2`.`field1` FROM `table2` WHERE `table2`.`type`=?)",
 			args:   []interface{}{"value"},
 			filter: where.Eq("field", rel.Any(
 				rel.Select("field1").From("table2").Where(where.Eq("type", "value")),
 			)),
 		},
 		{
-			result: " WHERE `field`=(SELECT `field1` FROM `table2` WHERE `type`=?)",
+			result: " WHERE `field`=(SELECT `table2`.`field1` FROM `table2` WHERE `table2`.`type`=?)",
 			args:   []interface{}{"value"},
 			filter: where.Eq("field",
 				rel.Select("field1").From("table2").Where(where.Eq("type", "value")),
 			),
 		},
 		{
-			result: " WHERE `field1` IN (SELECT `field2` FROM `table2` WHERE `field3` IN (?,?))",
+			result: " WHERE `field1` IN (SELECT `table2`.`field2` FROM `table2` WHERE `table2`.`field3` IN (?,?))",
 			args:   []interface{}{"value1", "value2"},
 			filter: where.In("field1", rel.Select("field2").From("table2").Where(
 				where.InString("field3", []string{"value1", "value2"}),
@@ -430,7 +443,7 @@ func TestQuery_WriteWhere_SubQuery(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			queryBuilder.WriteWhere(&buffer, test.filter)
+			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
@@ -447,24 +460,25 @@ func TestQuery_WriteWhere_SubQuery_ordinal(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
-			result: " WHERE \"field1\"=ANY(SELECT \"field2\" FROM \"table2\" WHERE \"type\"=$1)",
+			result: " WHERE \"field1\"=ANY(SELECT \"table2\".\"field2\" FROM \"table2\" WHERE \"table2\".\"type\"=$1)",
 			args:   []interface{}{"value"},
 			filter: where.Eq("field1", rel.Any(
 				rel.Select("field2").From("table2").Where(where.Eq("type", "value")),
 			)),
 		},
 		{
-			result: " WHERE \"field1\"=(SELECT \"field2\" FROM \"table2\" WHERE \"type\"=$1)",
+			result: " WHERE \"field1\"=(SELECT \"table2\".\"field2\" FROM \"table2\" WHERE \"table2\".\"type\"=$1)",
 			args:   []interface{}{"value"},
 			filter: where.Eq("field1",
 				rel.Select("field2").From("table2").Where(where.Eq("type", "value")),
 			),
 		},
 		{
-			result: " WHERE \"field1\" IN (SELECT \"field2\" FROM \"table2\" WHERE \"field3\" IN ($1,$2))",
+			result: " WHERE \"field1\" IN (SELECT \"table2\".\"field2\" FROM \"table2\" WHERE \"table2\".\"field3\" IN ($1,$2))",
 			args:   []interface{}{"value1", "value2"},
 			filter: where.In("field1",
 				rel.Select("field2").From("table2").Where(
@@ -480,7 +494,7 @@ func TestQuery_WriteWhere_SubQuery_ordinal(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			queryBuilder.WriteWhere(&buffer, test.filter)
+			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
@@ -496,14 +510,20 @@ func TestQuery_WriteGroupBy(t *testing.T) {
 
 	t.Run("single field", func(t *testing.T) {
 		buffer := bufferFactory.Create()
-		queryBuilder.WriteGroupBy(&buffer, []string{"city"})
+		queryBuilder.WriteGroupBy(&buffer, "", []string{"city"})
 		assert.Equal(t, " GROUP BY `city`", buffer.String())
 	})
 
 	t.Run("multiple fields", func(t *testing.T) {
 		buffer := bufferFactory.Create()
-		queryBuilder.WriteGroupBy(&buffer, []string{"city", "nation"})
+		queryBuilder.WriteGroupBy(&buffer, "", []string{"city", "nation"})
 		assert.Equal(t, " GROUP BY `city`,`nation`", buffer.String())
+	})
+
+	t.Run("multiple fields with table", func(t *testing.T) {
+		buffer := bufferFactory.Create()
+		queryBuilder.WriteGroupBy(&buffer, "table", []string{"city", "table2.nation"})
+		assert.Equal(t, " GROUP BY `table`.`city`,`table2`.`nation`", buffer.String())
 	})
 }
 
@@ -516,6 +536,7 @@ func TestQuery_WriteHaving(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
@@ -540,7 +561,7 @@ func TestQuery_WriteHaving(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			queryBuilder.WriteHaving(&buffer, test.filter)
+			queryBuilder.WriteHaving(&buffer, test.table, test.filter)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
@@ -557,6 +578,7 @@ func TestQuery_WriteHaving_ordinal(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
@@ -577,7 +599,7 @@ func TestQuery_WriteHaving_ordinal(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			queryBuilder.WriteHaving(&buffer, test.filter)
+			queryBuilder.WriteHaving(&buffer, test.table, test.filter)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
@@ -593,15 +615,20 @@ func TestQuery_WriteOrderBy(t *testing.T) {
 
 	t.Run("single sort", func(t *testing.T) {
 		buffer := bufferFactory.Create()
-		queryBuilder.WriteOrderBy(&buffer, []rel.SortQuery{sort.Asc("name")})
+		queryBuilder.WriteOrderBy(&buffer, "", []rel.SortQuery{sort.Asc("name")})
 		assert.Equal(t, " ORDER BY `name` ASC", buffer.String())
 	})
 
 	t.Run("multiple sorts", func(t *testing.T) {
 		buffer := bufferFactory.Create()
-		queryBuilder.WriteOrderBy(&buffer, []rel.SortQuery{sort.Asc("name"), sort.Desc("created_at")})
+		queryBuilder.WriteOrderBy(&buffer, "", []rel.SortQuery{sort.Asc("name"), sort.Desc("created_at")})
 		assert.Equal(t, " ORDER BY `name` ASC, `created_at` DESC", buffer.String())
+	})
 
+	t.Run("multiple sorts with table", func(t *testing.T) {
+		buffer := bufferFactory.Create()
+		queryBuilder.WriteOrderBy(&buffer, "table", []rel.SortQuery{sort.Asc("name"), sort.Desc("table2.created_at")})
+		assert.Equal(t, " ORDER BY `table`.`name` ASC, `table2`.`created_at` DESC", buffer.String())
 	})
 }
 

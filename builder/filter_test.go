@@ -18,6 +18,7 @@ func TestFilter_Write(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
@@ -176,7 +177,7 @@ func TestFilter_Write(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			filterBuilder.Write(&buffer, test.filter, queryBuilder)
+			filterBuilder.Write(&buffer, test.table, test.filter, queryBuilder)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
@@ -194,6 +195,7 @@ func TestFilter_Write_ordinal(t *testing.T) {
 	tests := []struct {
 		result string
 		args   []interface{}
+		table  string
 		filter rel.FilterQuery
 	}{
 		{
@@ -353,7 +355,7 @@ func TestFilter_Write_ordinal(t *testing.T) {
 				buffer = bufferFactory.Create()
 			)
 
-			filterBuilder.Write(&buffer, test.filter, queryBuilder)
+			filterBuilder.Write(&buffer, test.table, test.filter, queryBuilder)
 
 			assert.Equal(t, test.result, buffer.String())
 			assert.Equal(t, test.args, buffer.Arguments())
