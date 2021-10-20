@@ -83,6 +83,11 @@ func TestQuery_Build(t *testing.T) {
 			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id"),
 		},
 		{
+			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id` AND (`transactions`.`status`=? AND `users`.`type`=?) WHERE `users`.`id`=?;",
+			args:   []interface{}{1, 2, 10},
+			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id", rel.Eq("status", 1), rel.Eq("users.type", 2)).Where(rel.Eq("id", 10)),
+		},
+		{
 			result: "SELECT `users`.* FROM `users` ORDER BY `users`.`created_at` ASC;",
 			query:  query.SortAsc("created_at"),
 		},
@@ -288,6 +293,7 @@ func TestQuery_WriteJoin(t *testing.T) {
 
 	tests := []struct {
 		result string
+		args   []interface{}
 		query  rel.Query
 	}{
 		{
@@ -310,6 +316,12 @@ func TestQuery_WriteJoin(t *testing.T) {
 			query: rel.From("transactions").JoinOn("users", "users.id", "transactions.user_id").
 				JoinOn("payments", "payments.id", "transactions.payment_id"),
 		},
+		{
+			result: " JOIN `users` ON `users`.`id`=`transactions`.`user_id` JOIN `payments` ON `payments`.`id`=`transactions`.`payment_id` AND `payments`.`deleted`=?",
+			query: rel.From("transactions").JoinOn("users", "users.id", "transactions.user_id").
+				JoinOn("payments", "payments.id", "transactions.payment_id", rel.Eq("deleted", false)),
+			args: []interface{}{false},
+		},
 	}
 
 	for _, test := range tests {
@@ -321,7 +333,7 @@ func TestQuery_WriteJoin(t *testing.T) {
 			queryBuilder.WriteJoin(&buffer, "transactions", rel.Build("", test.query).JoinQuery)
 
 			assert.Equal(t, test.result, buffer.String())
-			assert.Nil(t, buffer.Arguments())
+			assert.Equal(t, test.args, buffer.Arguments())
 		})
 	}
 }

@@ -127,6 +127,10 @@ func (q Query) WriteJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
 			buffer.WriteEscape(from)
 			buffer.WriteString("=")
 			buffer.WriteEscape(to)
+			if !join.Filter.None() {
+				buffer.WriteString(" AND ")
+				q.Filter.Write(buffer, join.Table, join.Filter, q)
+			}
 		}
 
 		buffer.AddArguments(join.Arguments...)
