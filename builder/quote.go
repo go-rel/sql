@@ -29,7 +29,7 @@ type Quote struct {
 }
 
 func (q Quote) ID(name string) string {
-	return q.IDPrefix + strings.Replace(name, q.IDSuffix, q.IDSuffixEscapeChar+q.IDSuffix, -1) + q.IDSuffix
+	return q.IDPrefix + strings.ReplaceAll(name, q.IDSuffix, q.IDSuffixEscapeChar+q.IDSuffix) + q.IDSuffix
 }
 
 func (q Quote) Value(v interface{}) string {
@@ -37,6 +37,6 @@ func (q Quote) Value(v interface{}) string {
 	default:
 		panic("unsupported value")
 	case string:
-		return q.ValueQuote + strings.Replace(v, q.ValueQuote, q.ValueQuoteEscapeChar+q.ValueQuote, -1) + q.ValueQuote
+		return q.ValueQuote + strings.ReplaceAll(v, q.ValueQuote, q.ValueQuoteEscapeChar+q.ValueQuote) + q.ValueQuote
 	}
 }
