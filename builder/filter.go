@@ -112,15 +112,23 @@ func (f Filter) BuildInclusion(buffer *Buffer, table string, filter rel.FilterQu
 		values = filter.Value.([]interface{})
 	)
 
-	buffer.WriteField(table, filter.Field)
-
-	if filter.Type == rel.FilterInOp {
-		buffer.WriteString(" IN ")
+	if len(values) == 0 {
+		if filter.Type == rel.FilterInOp {
+			buffer.WriteString("1=0")
+		} else {
+			buffer.WriteString("1=1")
+		}
 	} else {
-		buffer.WriteString(" NOT IN ")
-	}
+		buffer.WriteField(table, filter.Field)
 
-	f.buildInclusionValues(buffer, values, queryWriter)
+		if filter.Type == rel.FilterInOp {
+			buffer.WriteString(" IN ")
+		} else {
+			buffer.WriteString(" NOT IN ")
+		}
+
+		f.buildInclusionValues(buffer, values, queryWriter)
+	}
 }
 
 func (f Filter) buildInclusionValues(buffer *Buffer, values []interface{}, queryWriter QueryWriter) {
