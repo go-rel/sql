@@ -83,9 +83,9 @@ func TestQuery_Build(t *testing.T) {
 			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id"),
 		},
 		{
-			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id` AND (`transactions`.`status`=? AND `users`.`type`=?);",
-			args:   []interface{}{1, 2},
-			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id", rel.Eq("status", 1), rel.Eq("users.type", 2)),
+			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id` AND (`transactions`.`status`=? AND `users`.`type`=?) WHERE `users`.`id`=?;",
+			args:   []interface{}{1, 2, 10},
+			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id", rel.Eq("status", 1), rel.Eq("users.type", 2)).Where(rel.Eq("id", 10)),
 		},
 		{
 			result: "SELECT `users`.* FROM `users` ORDER BY `users`.`created_at` ASC;",
