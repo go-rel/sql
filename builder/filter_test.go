@@ -78,6 +78,12 @@ func TestFilter_Write(t *testing.T) {
 			filter: where.In("field", "value1", "value2", "value3"),
 		},
 		{
+			result: "1=0",
+			args:   nil,
+			filter: where.In("field", []interface{}{}...),
+		},
+
+		{
 			result: "`field` NOT IN (?)",
 			args:   []interface{}{"value1"},
 			filter: where.Nin("field", "value1"),
@@ -91,6 +97,11 @@ func TestFilter_Write(t *testing.T) {
 			result: "`field` NOT IN (?,?,?)",
 			args:   []interface{}{"value1", "value2", "value3"},
 			filter: where.Nin("field", "value1", "value2", "value3"),
+		},
+		{
+			result: "1=1",
+			args:   nil,
+			filter: where.Nin("field", []interface{}{}...),
 		},
 		{
 			result: "`field` LIKE ?",
