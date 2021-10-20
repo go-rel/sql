@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -16,7 +15,6 @@ import (
 
 // UnescapeCharacter disable field escaping when it starts with this character.
 var UnescapeCharacter byte = '^'
-var regexNumber = regexp.MustCompile(`^\d+$`)
 
 var escapeCache sync.Map
 
@@ -132,7 +130,7 @@ func (b Buffer) escape(table, value string) string {
 
 	if len(value) > 0 && value[0] == UnescapeCharacter {
 		escapedValue = value[1:]
-	} else if regexNumber.MatchString(value) {
+	} else if _, err := strconv.Atoi(value); err == nil {
 		escapedValue = value
 	} else if i := strings.Index(strings.ToLower(value), " as "); i > -1 {
 		escapedValue = b.escape(table, value[:i]) + " AS " + b.escape("", value[i+4:])
