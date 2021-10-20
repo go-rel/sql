@@ -31,7 +31,7 @@ func TestUpdate_Build(t *testing.T) {
 	assert.ElementsMatch(t, []interface{}{"foo", 10, true}, qargs)
 
 	qs, qargs = updateBuilder.Build("users", "id", mutates, where.Eq("id", 1))
-	assert.Regexp(t, fmt.Sprint("UPDATE `users` SET `", `\w*`, "`=", `\?`, ",`", `\w*`, "`=", `\?`, ",`", `\w*`, "`=", `\?`, " WHERE `id`=", `\?`, ";"), qs)
+	assert.Regexp(t, fmt.Sprint("UPDATE `users` SET `", `\w*`, "`=", `\?`, ",`", `\w*`, "`=", `\?`, ",`", `\w*`, "`=", `\?`, " WHERE `users`.`id`=", `\?`, ";"), qs)
 	assert.ElementsMatch(t, []interface{}{"foo", 10, true, 1}, qargs)
 }
 
@@ -56,7 +56,7 @@ func TestUpdate_Build_ordinal(t *testing.T) {
 	assert.ElementsMatch(t, []interface{}{"foo", 10, true}, args)
 
 	qs, args = updateBuilder.Build("users", "id", mutates, where.Eq("id", 1))
-	assert.Regexp(t, `UPDATE "users" SET "\w*"=\$1,"\w*"=\$2,"\w*"=\$3 WHERE "id"=\$4;`, qs)
+	assert.Regexp(t, `UPDATE "users" SET "\w*"=\$1,"\w*"=\$2,"\w*"=\$3 WHERE "users"."id"=\$4;`, qs)
 	assert.ElementsMatch(t, []interface{}{"foo", 10, true, 1}, args)
 }
 

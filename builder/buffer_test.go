@@ -12,6 +12,7 @@ func TestBuffer_escape(t *testing.T) {
 	buffer := Buffer{Quoter: Quote{IDPrefix: "[", IDSuffix: "]"}}
 
 	tests := []struct {
+		table  string
 		field  string
 		result string
 	}{
@@ -24,6 +25,7 @@ func TestBuffer_escape(t *testing.T) {
 			result: "[user].[address] AS [home_address]",
 		},
 		{
+			table:  "ignored",
 			field:  "^FIELD([gender], \"male\") AS order",
 			result: "FIELD([gender], \"male\") AS order",
 		},
@@ -35,11 +37,31 @@ func TestBuffer_escape(t *testing.T) {
 			field:  "user.*",
 			result: "[user].*",
 		},
+		{
+			table:  "user",
+			field:  "*",
+			result: "[user].*",
+		},
+		{
+			table:  "user",
+			field:  "address as home_address",
+			result: "[user].[address] AS [home_address]",
+		},
+		{
+			table:  "user",
+			field:  "count(*) as count",
+			result: "count([user].*) AS [count]",
+		},
+		{
+			table:  "user",
+			field:  "person.address as home_address",
+			result: "[person].[address] AS [home_address]",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
 			var (
-				result = buffer.escape(test.field)
+				result = buffer.escape(test.table, test.field)
 			)
 
 			assert.Equal(t, test.result, result)
