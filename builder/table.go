@@ -43,23 +43,25 @@ func (t Table) WriteCreateTable(buffer *Buffer, table rel.Table) {
 	}
 
 	buffer.WriteEscape(table.Name)
-	buffer.WriteString(" (")
+	if len(table.Definitions) > 0 {
+		buffer.WriteString(" (")
 
-	for i, def := range table.Definitions {
-		if i > 0 {
-			buffer.WriteString(", ")
+		for i, def := range table.Definitions {
+			if i > 0 {
+				buffer.WriteString(", ")
+			}
+			switch v := def.(type) {
+			case rel.Column:
+				t.WriteColumn(buffer, v)
+			case rel.Key:
+				t.WriteKey(buffer, v)
+			case rel.Raw:
+				buffer.WriteString(string(v))
+			}
 		}
-		switch v := def.(type) {
-		case rel.Column:
-			t.WriteColumn(buffer, v)
-		case rel.Key:
-			t.WriteKey(buffer, v)
-		case rel.Raw:
-			buffer.WriteString(string(v))
-		}
+
+		buffer.WriteByte(')')
 	}
-
-	buffer.WriteByte(')')
 	t.WriteOptions(buffer, table.Options)
 	buffer.WriteByte(';')
 }

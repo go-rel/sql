@@ -34,6 +34,15 @@ func TestTable_Build(t *testing.T) {
 			},
 		},
 		{
+			result: "CREATE TABLE `products_2021` PARTITION OF `products` FOR VALUES FROM ('2021-01-01') TO ('2021-01-31');",
+			table: rel.Table{
+				Op:          rel.SchemaCreate,
+				Name:        "products_2021",
+				Definitions: []rel.TableDefinition{},
+				Options:     "PARTITION OF `products` FOR VALUES FROM ('2021-01-01') TO ('2021-01-31')",
+			},
+		},
+		{
 			result: "CREATE TABLE `columns` (`bool` BOOL NOT NULL DEFAULT false, `int` INT(11) UNSIGNED, `bigint` BIGINT(20) UNSIGNED, `float` FLOAT(24) UNSIGNED, `decimal` DECIMAL(6,2) UNSIGNED, `string` VARCHAR(144) UNIQUE, `text` TEXT(1000), `date` DATE, `datetime` DATETIME DEFAULT '2020-01-01 01:00:00', `time` TIME, `blob` blob, PRIMARY KEY (`int`), FOREIGN KEY (`int`, `string`) REFERENCES `products` (`id`, `name`) ON DELETE CASCADE ON UPDATE CASCADE, UNIQUE `date_unique` (`date`)) Engine=InnoDB;",
 			table: rel.Table{
 				Op:   rel.SchemaCreate,
