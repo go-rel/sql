@@ -27,7 +27,7 @@ func TestTable_Build(t *testing.T) {
 				Op:   rel.SchemaCreate,
 				Name: "products",
 				Definitions: []rel.TableDefinition{
-					rel.Column{Name: "id", Type: rel.ID},
+					rel.Column{Name: "id", Type: rel.ID, Primary: true},
 					rel.Column{Name: "name", Type: rel.String},
 					rel.Column{Name: "description", Type: rel.Text},
 				},
@@ -73,7 +73,7 @@ func TestTable_Build(t *testing.T) {
 				Name:     "products",
 				Optional: true,
 				Definitions: []rel.TableDefinition{
-					rel.Column{Name: "id", Type: rel.BigID},
+					rel.Column{Name: "id", Type: rel.BigID, Primary: true},
 					rel.Column{Name: "data", Type: rel.JSON},
 					rel.Raw("`raw` BOOL"),
 				},

@@ -20,9 +20,9 @@ func ColumnMapper(column *rel.Column) (string, int, int) {
 
 	switch column.Type {
 	case rel.ID:
-		typ = "INT UNSIGNED AUTO_INCREMENT PRIMARY KEY"
+		typ = "INT UNSIGNED AUTO_INCREMENT"
 	case rel.BigID:
-		typ = "BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY"
+		typ = "BIGINT UNSIGNED AUTO_INCREMENT"
 	case rel.Bool:
 		typ = "BOOL"
 	case rel.Int:

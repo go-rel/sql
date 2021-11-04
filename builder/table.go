@@ -158,6 +158,10 @@ func (t Table) WriteColumn(buffer *Buffer, column rel.Column) {
 		buffer.WriteString(" NOT NULL")
 	}
 
+	if column.Primary {
+		buffer.WriteString(" PRIMARY KEY")
+	}
+
 	if column.Default != nil {
 		buffer.WriteString(" DEFAULT ")
 		buffer.WriteValue(column.Default)
