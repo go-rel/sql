@@ -1,7 +1,6 @@
 package specs
 
 import (
-	"testing"
 	"time"
 
 	"github.com/go-rel/rel"
@@ -11,7 +10,7 @@ import (
 var m migrator.Migrator
 
 // Setup database for specs execution.
-func Setup(t *testing.T, repo rel.Repository) func() {
+func Setup(repo rel.Repository) func() {
 	m = migrator.New(repo)
 	m.Register(1,
 		func(schema *rel.Schema) {
@@ -94,7 +93,7 @@ func Setup(t *testing.T, repo rel.Repository) func() {
 }
 
 // Migrate specs.
-func Migrate(t *testing.T, repo rel.Repository, flags ...Flag) {
+func Migrate(flags ...Flag) {
 	m.Register(5,
 		func(schema *rel.Schema) {
 			schema.CreateTable("dummies", func(t *rel.Table) {
