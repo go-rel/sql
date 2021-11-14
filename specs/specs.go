@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-rel/rel"
-	"github.com/go-rel/rel/adapter/sql"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -73,13 +72,6 @@ type Composite struct {
 	Primary2 int `db:",primary"`
 	Data     string
 }
-
-var (
-	config = sql.Config{
-		Placeholder: "?",
-		EscapeChar:  "`",
-	}
-)
 
 func assertConstraint(t *testing.T, err error, ctype rel.ConstraintType, key string) {
 	assert.NotNil(t, err)
