@@ -190,6 +190,8 @@ func assertRecord(t *testing.T, repo rel.Repository, record interface{}) {
 		var found Composite
 		repo.MustFind(ctx, &found, where.Eq("primary1", v.Primary1).AndEq("primary2", v.Primary2))
 		assert.Equal(t, found, *v)
+	default:
+		panic("not supported")
 	}
 }
 
@@ -256,7 +258,7 @@ func InsertOnConflictIgnore(t *testing.T, repo rel.Repository) {
 	waitForReplication()
 
 	// not replaced
-	assertRecord(t, repo, existing)
+	assertRecord(t, repo, &existing)
 }
 
 // InsertAllOnConflictIgnore tests for multiple inserts.
@@ -270,7 +272,7 @@ func InsertAllOnConflictIgnore(t *testing.T, repo rel.Repository) {
 	waitForReplication()
 
 	// not replaced
-	assertRecord(t, repo, existing)
+	assertRecords(t, repo, &existing)
 }
 
 // InsertOnConflictReplace tests for multiple inserts.
@@ -280,11 +282,11 @@ func InsertOnConflictReplace(t *testing.T, repo rel.Repository) {
 	waitForReplication()
 
 	reInsert := User{ID: existing.ID, Name: "replaced"}
-	assert.Nil(t, repo.Insert(ctx, &reInsert, rel.OnConflictIgnore()))
+	assert.Nil(t, repo.Insert(ctx, &reInsert, rel.OnConflictReplace()))
 	waitForReplication()
 
 	// replaced
-	assertRecord(t, repo, reInsert)
+	assertRecord(t, repo, &reInsert)
 }
 
 // InsertAllOnConflictReplace tests for multiple inserts.
@@ -294,11 +296,11 @@ func InsertAllOnConflictReplace(t *testing.T, repo rel.Repository) {
 	waitForReplication()
 
 	reInsert := []User{{ID: existing[0].ID, Name: "replaced 1"}, {ID: existing[1].ID, Name: "replaced 2"}}
-	assert.Nil(t, repo.InsertAll(ctx, &reInsert, rel.OnConflictIgnore()))
+	assert.Nil(t, repo.InsertAll(ctx, &reInsert, rel.OnConflictReplace()))
 	waitForReplication()
 
 	// replaced
-	assertRecord(t, repo, reInsert)
+	assertRecords(t, repo, &reInsert)
 }
 
 func assertRecords(t *testing.T, repo rel.Repository, records interface{}) {
@@ -327,5 +329,7 @@ func assertRecords(t *testing.T, repo rel.Repository, records interface{}) {
 
 		repo.MustFindAll(ctx, &found, where.InInt("id", ids))
 		assert.Equal(t, found, *v)
+	default:
+		panic("not supported")
 	}
 }
