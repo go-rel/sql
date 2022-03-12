@@ -260,7 +260,7 @@ func InsertOnConflictIgnore(t *testing.T, repo rel.Repository) {
 }
 
 // InsertAllOnConflictIgnore tests for multiple inserts.
-func InsertOnAllConflictIgnore(t *testing.T, repo rel.Repository) {
+func InsertAllOnConflictIgnore(t *testing.T, repo rel.Repository) {
 	existing := []User{{Name: "on conflict ignore 1"}, {Name: "on conflict ignore 2"}}
 	assert.Nil(t, repo.InsertAll(ctx, &existing))
 	waitForReplication()
@@ -288,7 +288,7 @@ func InsertOnConflictReplace(t *testing.T, repo rel.Repository) {
 }
 
 // InsertAllOnConflictReplace tests for multiple inserts.
-func InsertOnAllConflictReplace(t *testing.T, repo rel.Repository) {
+func InsertAllOnConflictReplace(t *testing.T, repo rel.Repository) {
 	existing := []User{{Name: "on conflict replace 1"}, {Name: "on conflict replace 2"}}
 	assert.Nil(t, repo.InsertAll(ctx, &existing))
 	waitForReplication()
