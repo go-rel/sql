@@ -245,6 +245,62 @@ func InsertAllPartialCustomPrimary(t *testing.T, repo rel.Repository) {
 	}
 }
 
+// InsertOnConflictIgnore tests for multiple inserts.
+func InsertOnConflictIgnore(t *testing.T, repo rel.Repository) {
+	existing := User{Name: "on conflict ignore"}
+	assert.Nil(t, repo.Insert(ctx, &existing))
+	waitForReplication()
+
+	replace := User{ID: existing.ID, Name: "inserted"}
+	assert.Nil(t, repo.Insert(ctx, &replace, rel.OnConflictIgnore()))
+	waitForReplication()
+
+	// not replaced
+	assertRecord(t, repo, existing)
+}
+
+// InsertAllOnConflictIgnore tests for multiple inserts.
+func InsertOnAllConflictIgnore(t *testing.T, repo rel.Repository) {
+	existing := []User{{Name: "on conflict ignore 1"}, {Name: "on conflict ignore 2"}}
+	assert.Nil(t, repo.InsertAll(ctx, &existing))
+	waitForReplication()
+
+	reInsert := []User{{ID: existing[0].ID, Name: "inserted 1"}, {ID: existing[1].ID, Name: "inserted 2"}}
+	assert.Nil(t, repo.InsertAll(ctx, &reInsert, rel.OnConflictIgnore()))
+	waitForReplication()
+
+	// not replaced
+	assertRecord(t, repo, existing)
+}
+
+// InsertOnConflictReplace tests for multiple inserts.
+func InsertOnConflictReplace(t *testing.T, repo rel.Repository) {
+	existing := User{Name: "on conflict replace"}
+	assert.Nil(t, repo.Insert(ctx, &existing))
+	waitForReplication()
+
+	reInsert := User{ID: existing.ID, Name: "replaced"}
+	assert.Nil(t, repo.Insert(ctx, &reInsert, rel.OnConflictIgnore()))
+	waitForReplication()
+
+	// replaced
+	assertRecord(t, repo, reInsert)
+}
+
+// InsertAllOnConflictReplace tests for multiple inserts.
+func InsertOnAllConflictReplace(t *testing.T, repo rel.Repository) {
+	existing := []User{{Name: "on conflict replace 1"}, {Name: "on conflict replace 2"}}
+	assert.Nil(t, repo.InsertAll(ctx, &existing))
+	waitForReplication()
+
+	reInsert := []User{{ID: existing[0].ID, Name: "replaced 1"}, {ID: existing[1].ID, Name: "replaced 2"}}
+	assert.Nil(t, repo.InsertAll(ctx, &reInsert, rel.OnConflictIgnore()))
+	waitForReplication()
+
+	// replaced
+	assertRecord(t, repo, reInsert)
+}
+
 func assertRecords(t *testing.T, repo rel.Repository, records interface{}) {
 	switch v := records.(type) {
 	case *[]User:

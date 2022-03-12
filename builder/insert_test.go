@@ -21,7 +21,7 @@ func BenchmarkInsert_Build(b *testing.B) {
 	)
 
 	for n := 0; n < b.N; n++ {
-		insertBuilder.Build("users", "id", mutates)
+		insertBuilder.Build("users", "id", mutates, rel.OnConflict{})
 	}
 }
 
@@ -35,7 +35,7 @@ func TestInsert_Build(t *testing.T) {
 			"age":   rel.Set("age", 10),
 			"agree": rel.Set("agree", true),
 		}
-		qs, args = insertBuilder.Build("users", "id", mutates)
+		qs, args = insertBuilder.Build("users", "id", mutates, rel.OnConflict{})
 	)
 
 	assert.Regexp(t, fmt.Sprint(`^INSERT INTO `, "`users`", ` \((`, "`", `\w*`, "`", `,?){3}\) VALUES \(\?,\?,\?\);`), qs)
@@ -57,7 +57,7 @@ func TestInsert_Build_ordinal(t *testing.T) {
 			"age":   rel.Set("age", 10),
 			"agree": rel.Set("agree", true),
 		}
-		qs, args = insertBuilder.Build("users", "id", mutates)
+		qs, args = insertBuilder.Build("users", "id", mutates, rel.OnConflict{})
 	)
 
 	assert.Regexp(t, `^INSERT INTO \"users\" \(("\w*",?){3}\) VALUES \(\$1,\$2,\$3\) RETURNING \"id\";`, qs)
@@ -73,7 +73,7 @@ func TestInsert_Build_defaultValuesDisabled(t *testing.T) {
 			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 		}
 		mutates  = map[string]rel.Mutate{}
-		qs, args = insertBuilder.Build("users", "id", mutates)
+		qs, args = insertBuilder.Build("users", "id", mutates, rel.OnConflict{})
 	)
 
 	assert.Equal(t, "INSERT INTO `users` () VALUES ();", qs)
@@ -88,9 +88,98 @@ func TestInsert_Build_defaultValuesEnabled(t *testing.T) {
 			InsertDefaultValues:   true,
 		}
 		mutates  = map[string]rel.Mutate{}
-		qs, args = insertBuilder.Build("users", "id", mutates)
+		qs, args = insertBuilder.Build("users", "id", mutates, rel.OnConflict{})
 	)
 
 	assert.Equal(t, "INSERT INTO `users` DEFAULT VALUES RETURNING `id`;", qs)
 	assert.Nil(t, args)
+}
+
+func TestInsert_Build_onConflictIgnore(t *testing.T) {
+	var (
+		insertBuilder = Insert{
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			OnConflict: OnConflict{
+				Statement:       "ON CONFLICT",
+				IgnoreStatement: "IGNORE",
+				SupportKey:      true,
+			},
+		}
+		mutates = map[string]rel.Mutate{
+			"id": rel.Set("id", 1),
+		}
+		onConflict = rel.OnConflict{Keys: []string{"id"}, Ignore: true}
+		qs, args   = insertBuilder.Build("users", "id", mutates, onConflict)
+	)
+
+	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON CONFLICT(`id`) IGNORE;", qs)
+	assert.Equal(t, []interface{}{1}, args)
+}
+
+func TestInsert_Build_onConflictReplace(t *testing.T) {
+	var (
+		insertBuilder = Insert{
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			OnConflict: OnConflict{
+				Statement:       "ON CONFLICT",
+				UpdateStatement: "DO UPDATE SET",
+				TableQualifier:  "EXCLUDED",
+				SupportKey:      true,
+			},
+		}
+		mutates = map[string]rel.Mutate{
+			"id": rel.Set("id", 1),
+		}
+		onConflict = rel.OnConflict{Keys: []string{"id", "username"}, Replace: true}
+		qs, args   = insertBuilder.Build("users", "id", mutates, onConflict)
+	)
+
+	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON CONFLICT(`id`,`username`) DO UPDATE SET `id`=`EXCLUDED`.`id`;", qs)
+	assert.Equal(t, []interface{}{1}, args)
+}
+
+func TestInsert_Build_onConflictReplaceUseValues(t *testing.T) {
+	var (
+		insertBuilder = Insert{
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			OnConflict: OnConflict{
+				Statement:       "ON DUPLICATE KEY",
+				UpdateStatement: "UPDATE",
+				UseValues:       true,
+			},
+		}
+		mutates = map[string]rel.Mutate{
+			"id":   rel.Set("id", 1),
+			"name": rel.Set("id", "foo"),
+		}
+		onConflict = rel.OnConflict{Keys: []string{"id"}, Replace: true}
+		qs, args   = insertBuilder.Build("users", "id", mutates, onConflict)
+	)
+
+	assert.Contains(t, []string{
+		"INSERT INTO `users` (`id`,`name`) VALUES (?,?) ON DUPLICATE KEY UPDATE `id`=VALUES(`id`),`name`=VALUES(`name`);",
+		"INSERT INTO `users` (`name`,`id`) VALUES (?,?) ON DUPLICATE KEY UPDATE `id`=VALUES(`id`),`name`=VALUES(`name`);",
+		"INSERT INTO `users` (`id`,`name`) VALUES (?,?) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`),`id`=VALUES(`id`);",
+		"INSERT INTO `users` (`name`,`id`) VALUES (?,?) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`),`id`=VALUES(`id`);",
+	}, qs)
+	assert.Equal(t, []interface{}{1, "foo"}, args)
+}
+
+func TestInsert_Build_onConflictFragment(t *testing.T) {
+	var (
+		insertBuilder = Insert{
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			OnConflict: OnConflict{
+				Statement: "ON CONFLICT",
+			},
+		}
+		mutates = map[string]rel.Mutate{
+			"id": rel.Set("id", 1),
+		}
+		onConflict = rel.OnConflict{Fragment: "SET `name`=?", FragmentArgs: []interface{}{"foo"}}
+		qs, args   = insertBuilder.Build("users", "id", mutates, onConflict)
+	)
+
+	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON CONFLICT SET `name`=?;", qs)
+	assert.Equal(t, []interface{}{1, "foo"}, args)
 }

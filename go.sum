@@ -9,6 +9,10 @@ github.com/go-rel/rel v0.30.0/go.mod h1:Wu6HB6x0oIiEOdUJClwmn7ByCmdL73U5gItAYOby
 github.com/go-rel/rel v0.31.0/go.mod h1:fCMlDiwDSSBSoZQ6ovUyjSqS2FfpLnhwr6tW9TgnhC8=
 github.com/go-rel/rel v0.32.0 h1:Y0JeQ/ZqQDB3x9QkSn8HiLtvt+5oFuYgS0tj+px59KU=
 github.com/go-rel/rel v0.32.0/go.mod h1:Ulbt8kctHMw3W1JBEflFkleOk+tIqmcKHY4r1eRuNSY=
+github.com/go-rel/rel v0.32.1-0.20220312032151-d0056cc820b8 h1:ATxD13a/aAKp6DhzYx9LxIqjSC+g2UFk+m1RUjYvilE=
+github.com/go-rel/rel v0.32.1-0.20220312032151-d0056cc820b8/go.mod h1:DhB9Xmt/ymaumJAB6Z3Kq+IybLwQhhrzr6ZLeXMygPo=
+github.com/go-rel/rel v0.32.1-0.20220312033944-1afddb520d93 h1:Bqj+8QTeAfHOrCMUUPL7ozDUjALTMr/ZbAhcFi7FCt4=
+github.com/go-rel/rel v0.32.1-0.20220312033944-1afddb520d93/go.mod h1:DhB9Xmt/ymaumJAB6Z3Kq+IybLwQhhrzr6ZLeXMygPo=
 github.com/go-rel/reltest v0.4.0/go.mod h1:3udgrKCZGCMFWc8k+RH975gUdUFPE/yspG2iWN9gjqU=
 github.com/go-rel/reltest v0.5.0/go.mod h1:onixPXWMVL+KILH7OdUufKDm1KN0H6FzXOP7OoNC9qM=
 github.com/go-rel/reltest v0.6.0 h1:mzF49w6jo1eyvfbpogL6BvxCuJrMwsjD+49qI9gCyEs=
