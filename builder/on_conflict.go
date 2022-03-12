@@ -25,10 +25,8 @@ func (oc OnConflict) Write(buffer *Buffer, fields []string, onConflict rel.OnCon
 	buffer.WriteByte(' ')
 	switch {
 	case onConflict.Ignore:
-		buffer.WriteString(oc.IgnoreStatement)
+		oc.WriteIgnore(buffer, fields)
 	case onConflict.Replace:
-		buffer.WriteString(oc.UpdateStatement)
-		buffer.WriteByte(' ')
 		oc.WriteReplace(buffer, fields)
 	case onConflict.Fragment != "":
 		buffer.WriteString(onConflict.Fragment)
@@ -38,7 +36,7 @@ func (oc OnConflict) Write(buffer *Buffer, fields []string, onConflict rel.OnCon
 
 func (oc OnConflict) WriteMutates(buffer *Buffer, mutates map[string]rel.Mutate, onConflict rel.OnConflict) {
 	var fields []string
-	if onConflict.Replace {
+	if onConflict.Replace || (onConflict.Ignore && oc.IgnoreStatement == "") {
 		fields = make([]string, len(mutates))
 		i := 0
 		for field := range mutates {
@@ -64,7 +62,24 @@ func (oc OnConflict) WriteKeys(buffer *Buffer, onConflict rel.OnConflict) {
 	buffer.WriteByte(')')
 }
 
+func (oc OnConflict) WriteIgnore(buffer *Buffer, fields []string) {
+	if oc.IgnoreStatement == "" && len(fields) != 0 {
+		// mysql specific
+		buffer.WriteString(oc.UpdateStatement)
+		buffer.WriteByte(' ')
+
+		buffer.WriteEscape(fields[0])
+		buffer.WriteByte('=')
+		buffer.WriteEscape(fields[0])
+	} else {
+		buffer.WriteString(oc.IgnoreStatement)
+	}
+}
+
 func (oc OnConflict) WriteReplace(buffer *Buffer, fields []string) {
+	buffer.WriteString(oc.UpdateStatement)
+	buffer.WriteByte(' ')
+
 	for i, field := range fields {
 		if i > 0 {
 			buffer.WriteByte(',')

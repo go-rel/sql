@@ -116,6 +116,26 @@ func TestInsert_Build_onConflictIgnore(t *testing.T) {
 	assert.Equal(t, []interface{}{1}, args)
 }
 
+func TestInsert_Build_onConflictIgnoreSelfAssign(t *testing.T) {
+	var (
+		insertBuilder = Insert{
+			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+			OnConflict: OnConflict{
+				Statement:       "ON DUPLICATE KEY",
+				UpdateStatement: "UPDATE",
+			},
+		}
+		mutates = map[string]rel.Mutate{
+			"id": rel.Set("id", 1),
+		}
+		onConflict = rel.OnConflict{Keys: []string{"id"}, Ignore: true}
+		qs, args   = insertBuilder.Build("users", "id", mutates, onConflict)
+	)
+
+	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON DUPLICATE KEY UPDATE `id`=`id`;", qs)
+	assert.Equal(t, []interface{}{1}, args)
+}
+
 func TestInsert_Build_onConflictReplace(t *testing.T) {
 	var (
 		insertBuilder = Insert{
