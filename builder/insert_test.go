@@ -162,7 +162,10 @@ func TestInsert_Build_onConflictReplaceUseValues(t *testing.T) {
 		"INSERT INTO `users` (`id`,`name`) VALUES (?,?) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`),`id`=VALUES(`id`);",
 		"INSERT INTO `users` (`name`,`id`) VALUES (?,?) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`),`id`=VALUES(`id`);",
 	}, qs)
-	assert.Equal(t, []interface{}{1, "foo"}, args)
+	assert.Contains(t, []interface{}{
+		[]interface{}{1, "foo"},
+		[]interface{}{"foo", 1},
+	}, args)
 }
 
 func TestInsert_Build_onConflictFragment(t *testing.T) {

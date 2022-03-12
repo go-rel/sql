@@ -206,7 +206,7 @@ func (s SQL) Aggregate(ctx context.Context, query rel.Query, mode string, field 
 // Insert inserts a record to database and returns its id.
 func (s SQL) Insert(ctx context.Context, query rel.Query, primaryField string, mutates map[string]rel.Mutate, onConflict rel.OnConflict) (interface{}, error) {
 	var (
-		statement, args = s.InsertBuilder.Build(query.Table, primaryField, mutates)
+		statement, args = s.InsertBuilder.Build(query.Table, primaryField, mutates, onConflict)
 		id, _, err      = s.Exec(ctx, statement, args)
 	)
 
@@ -216,7 +216,7 @@ func (s SQL) Insert(ctx context.Context, query rel.Query, primaryField string, m
 // InsertAll inserts multiple records to database and returns its ids.
 func (s SQL) InsertAll(ctx context.Context, query rel.Query, primaryField string, fields []string, bulkMutates []map[string]rel.Mutate, onConflict rel.OnConflict) ([]interface{}, error) {
 	var (
-		statement, args = s.InsertAllBuilder.Build(query.Table, primaryField, fields, bulkMutates)
+		statement, args = s.InsertAllBuilder.Build(query.Table, primaryField, fields, bulkMutates, onConflict)
 		id, _, err      = s.Exec(ctx, statement, args)
 	)
 
