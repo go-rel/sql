@@ -115,11 +115,25 @@ func (b *Buffer) WriteEscape(value string) {
 }
 
 func (b Buffer) escape(table, value string) string {
+	var escaped_table string
+	if table != "" {
+		parts := strings.Split(table, ".")
+		if len(parts) != 1 {
+			for i, part := range parts {
+				part = strings.TrimSpace(part)
+				parts[i] = b.Quoter.ID(part)
+			}
+			escaped_table = strings.Join(parts, ".")
+		} else {
+			escaped_table = b.Quoter.ID(table)
+		}
+	}
+
 	if value == "*" {
 		if table == "" {
 			return value
 		}
-		return b.Quoter.ID(table) + ".*"
+		return escaped_table + ".*"
 	}
 
 	key := escapeCacheKey{table: table, value: value, quoter: b.Quoter}
@@ -138,9 +152,6 @@ func (b Buffer) escape(table, value string) string {
 		escapedValue = value[:start+1] + b.escape(table, value[start+1:end]) + value[end:]
 	} else {
 		parts := strings.Split(value, ".")
-		if len(parts) == 1 && table != "" {
-			parts = []string{table, parts[0]}
-		}
 		for i, part := range parts {
 			part = strings.TrimSpace(part)
 			if part == "*" && i == len(parts)-1 {
@@ -148,7 +159,11 @@ func (b Buffer) escape(table, value string) string {
 			}
 			parts[i] = b.Quoter.ID(part)
 		}
-		escapedValue = strings.Join(parts, ".")
+		result := strings.Join(parts, ".")
+		if len(parts) == 1 && table != "" {
+			result = escaped_table + "." + result
+		}
+		escapedValue = result
 	}
 
 	escapeCache.Store(key, escapedValue)
