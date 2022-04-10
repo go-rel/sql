@@ -115,6 +115,10 @@ func (b *Buffer) WriteEscape(value string) {
 }
 
 func (b Buffer) escape(table, value string) string {
+	if table == "" && value == "*" {
+		return value
+	}
+
 	key := escapeCacheKey{table: table, value: value, quoter: b.Quoter}
 	escapedValue, ok := escapeCache.Load(key)
 	if ok {
@@ -136,9 +140,6 @@ func (b Buffer) escape(table, value string) string {
 	}
 
 	if value == "*" {
-		if table == "" {
-			return value
-		}
 		return escaped_table + ".*"
 	}
 
