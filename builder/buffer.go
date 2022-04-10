@@ -115,10 +115,16 @@ func (b *Buffer) WriteEscape(value string) {
 }
 
 func (b Buffer) escape(table, value string) string {
+	key := escapeCacheKey{table: table, value: value, quoter: b.Quoter}
+	escapedValue, ok := escapeCache.Load(key)
+	if ok {
+		return escapedValue.(string)
+	}
+
 	var escaped_table string
 	if table != "" {
-		parts := strings.Split(table, ".")
-		if len(parts) != 1 {
+		if strings.IndexByte(table, '.') >= 0 {
+			parts := strings.Split(table, ".")
 			for i, part := range parts {
 				part = strings.TrimSpace(part)
 				parts[i] = b.Quoter.ID(part)
@@ -134,12 +140,6 @@ func (b Buffer) escape(table, value string) string {
 			return value
 		}
 		return escaped_table + ".*"
-	}
-
-	key := escapeCacheKey{table: table, value: value, quoter: b.Quoter}
-	escapedValue, ok := escapeCache.Load(key)
-	if ok {
-		return escapedValue.(string)
 	}
 
 	if len(value) > 0 && value[0] == UnescapeCharacter {
