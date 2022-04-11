@@ -43,6 +43,11 @@ func TestBuffer_escape(t *testing.T) {
 			result: "[user].*",
 		},
 		{
+			table:  "user.user",
+			field:  "*",
+			result: "[user].[user].*",
+		},
+		{
 			table:  "user",
 			field:  "address as home_address",
 			result: "[user].[address] AS [home_address]",

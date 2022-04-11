@@ -115,11 +115,8 @@ func (b *Buffer) WriteEscape(value string) {
 }
 
 func (b Buffer) escape(table, value string) string {
-	if value == "*" {
-		if table == "" {
-			return value
-		}
-		return b.Quoter.ID(table) + ".*"
+	if table == "" && value == "*" {
+		return value
 	}
 
 	key := escapeCacheKey{table: table, value: value, quoter: b.Quoter}
@@ -128,7 +125,23 @@ func (b Buffer) escape(table, value string) string {
 		return escapedValue.(string)
 	}
 
-	if len(value) > 0 && value[0] == UnescapeCharacter {
+	var escaped_table string
+	if table != "" {
+		if strings.IndexByte(table, '.') >= 0 {
+			parts := strings.Split(table, ".")
+			for i, part := range parts {
+				part = strings.TrimSpace(part)
+				parts[i] = b.Quoter.ID(part)
+			}
+			escaped_table = strings.Join(parts, ".")
+		} else {
+			escaped_table = b.Quoter.ID(table)
+		}
+	}
+
+	if value == "*" {
+		escapedValue = escaped_table + ".*"
+	} else if len(value) > 0 && value[0] == UnescapeCharacter {
 		escapedValue = value[1:]
 	} else if _, err := strconv.Atoi(value); err == nil {
 		escapedValue = value
@@ -138,9 +151,6 @@ func (b Buffer) escape(table, value string) string {
 		escapedValue = value[:start+1] + b.escape(table, value[start+1:end]) + value[end:]
 	} else {
 		parts := strings.Split(value, ".")
-		if len(parts) == 1 && table != "" {
-			parts = []string{table, parts[0]}
-		}
 		for i, part := range parts {
 			part = strings.TrimSpace(part)
 			if part == "*" && i == len(parts)-1 {
@@ -148,7 +158,11 @@ func (b Buffer) escape(table, value string) string {
 			}
 			parts[i] = b.Quoter.ID(part)
 		}
-		escapedValue = strings.Join(parts, ".")
+		result := strings.Join(parts, ".")
+		if len(parts) == 1 && table != "" {
+			result = escaped_table + "." + result
+		}
+		escapedValue = result
 	}
 
 	escapeCache.Store(key, escapedValue)
