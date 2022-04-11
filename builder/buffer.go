@@ -140,10 +140,8 @@ func (b Buffer) escape(table, value string) string {
 	}
 
 	if value == "*" {
-		return escaped_table + ".*"
-	}
-
-	if len(value) > 0 && value[0] == UnescapeCharacter {
+		escapedValue = escaped_table + ".*"
+	} else if len(value) > 0 && value[0] == UnescapeCharacter {
 		escapedValue = value[1:]
 	} else if _, err := strconv.Atoi(value); err == nil {
 		escapedValue = value
