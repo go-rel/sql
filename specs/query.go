@@ -84,6 +84,13 @@ func QueryJoin(t *testing.T, repo rel.Repository) {
 	run(t, repo, tests)
 }
 
+// QueryJoinAssoc tests query specifications with join.
+func QueryJoinAssoc(t *testing.T, repo rel.Repository) {
+	assert.Nil(t, repo.Find(ctx, &User{}, rel.JoinAssoc("addresses")))
+	assert.Nil(t, repo.Find(ctx, &User{}, rel.JoinAssoc("primary_address")))
+	assert.Nil(t, repo.Find(ctx, &Address{}, rel.JoinAssoc("user")))
+}
+
 // Query tests query specifications without join.
 func QueryWhereSubQuery(t *testing.T, repo rel.Repository, flags ...Flag) {
 	tests := []rel.Querier{
