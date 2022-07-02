@@ -146,7 +146,7 @@ func (b Buffer) escape(table, value string) string {
 	} else if _, err := strconv.Atoi(value); err == nil {
 		escapedValue = value
 	} else if i := strings.Index(strings.ToLower(value), " as "); i > -1 {
-		escapedValue = b.escape(table, value[:i]) + " AS " + b.escape("", value[i+4:])
+		escapedValue = b.escape(table, value[:i]) + " AS " + b.Quoter.ID(value[i+4:])
 	} else if start, end := strings.IndexRune(value, '('), strings.IndexRune(value, ')'); start >= 0 && end >= 0 && end > start {
 		escapedValue = value[:start+1] + b.escape(table, value[start+1:end]) + value[end:]
 	} else {

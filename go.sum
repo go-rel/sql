@@ -6,6 +6,8 @@ github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWo
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/go-rel/rel v0.36.0 h1:GgKB+0btoZVQ+6YBboPJvRksNtbMJOTv+iMO79t+QMo=
 github.com/go-rel/rel v0.36.0/go.mod h1:SHjO9VOInj8GD2cTVWmTnOS+rj5IJZoDy8LEyd5oDUQ=
+github.com/go-rel/rel v0.36.1-0.20220626041905-57e2c90f6a68 h1:JLJP+fOZ38nuMoB5nl5rYh3mFV2gyTrdArdt9v628YI=
+github.com/go-rel/rel v0.36.1-0.20220626041905-57e2c90f6a68/go.mod h1:tMCCnpxd1jf0blLfwNeCsMrVPLWWVh1SdwLCdrxGJ7s=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.4.0-rc.1/go.mod h1:ceaxUfeHdC40wWswd/P6IGgMaK3YpKi5j83Wpe3EHw8=
 github.com/golang/protobuf v1.4.0-rc.1.0.20200221234624-67d41d38c208/go.mod h1:xKAWHe0F5eneWXFV3EuXVDTCmh+JuBKY0li0aMyXATA=
