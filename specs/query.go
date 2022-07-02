@@ -89,6 +89,8 @@ func QueryJoinAssoc(t *testing.T, repo rel.Repository) {
 	dbUser := User{Addresses: []Address{{}}}
 	repo.MustInsert(ctx, &dbUser)
 
+	waitForReplication()
+
 	t.Run("HasMany", func(t *testing.T) {
 		assert.Nil(t, repo.Find(ctx, &User{}, rel.JoinAssoc("addresses").Where(where.Eq("id", dbUser.ID))))
 	})
