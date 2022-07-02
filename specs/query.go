@@ -96,7 +96,6 @@ func QueryJoinAssoc(t *testing.T, repo rel.Repository) {
 	t.Run("HasOne", func(t *testing.T) {
 		var user User
 		assert.Nil(t, repo.Find(ctx, &user, rel.Select("*", "primary_address.*").JoinAssoc("primary_address").Where(where.Eq("id", dbUser.ID))))
-
 		assert.Equal(t, dbUser.Addresses[0].ID, user.PrimaryAddress.ID)
 	})
 
