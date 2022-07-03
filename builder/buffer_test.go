@@ -62,6 +62,11 @@ func TestBuffer_escape(t *testing.T) {
 			field:  "person.address as home_address",
 			result: "[person].[address] AS [home_address]",
 		},
+		{
+			table:  "user",
+			field:  "person.address as person.address",
+			result: "[person].[address] AS [person.address]",
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {

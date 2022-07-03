@@ -84,6 +84,30 @@ func QueryJoin(t *testing.T, repo rel.Repository) {
 	run(t, repo, tests)
 }
 
+// QueryJoinAssoc tests query specifications with join.
+func QueryJoinAssoc(t *testing.T, repo rel.Repository) {
+	dbUser := User{Addresses: []Address{{}}}
+	repo.MustInsert(ctx, &dbUser)
+
+	waitForReplication()
+
+	t.Run("HasMany", func(t *testing.T) {
+		assert.Nil(t, repo.Find(ctx, &User{}, rel.JoinAssoc("addresses").Where(where.Eq("id", dbUser.ID))))
+	})
+
+	t.Run("HasOne", func(t *testing.T) {
+		var user User
+		assert.Nil(t, repo.Find(ctx, &user, rel.Select("*", "primary_address.*").JoinAssoc("primary_address").Where(where.Eq("id", dbUser.ID))))
+		assert.Equal(t, dbUser.Addresses[0].ID, user.PrimaryAddress.ID)
+	})
+
+	t.Run("BelongsTo", func(t *testing.T) {
+		var address Address
+		assert.Nil(t, repo.Find(ctx, &address, rel.Select("*", "user.*").JoinAssoc("user").Where(where.Eq("id", dbUser.Addresses[0].ID))))
+		assert.Equal(t, dbUser.ID, address.User.ID)
+	})
+}
+
 // Query tests query specifications without join.
 func QueryWhereSubQuery(t *testing.T, repo rel.Repository, flags ...Flag) {
 	tests := []rel.Querier{
