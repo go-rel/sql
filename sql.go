@@ -102,6 +102,7 @@ func (s SQL) Begin(ctx context.Context) (rel.Adapter, error) {
 		DeleteBuilder:    s.DeleteBuilder,
 		TableBuilder:     s.TableBuilder,
 		IndexBuilder:     s.IndexBuilder,
+		Increment:        s.Increment,
 		IncrementFunc:    s.IncrementFunc,
 		ErrorMapper:      s.ErrorMapper,
 		Tx:               tx,
