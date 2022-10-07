@@ -158,6 +158,19 @@ func TestTable_BuildWithDefinitionFilter(t *testing.T) {
 		table  rel.Table
 	}{
 		{
+			result: "ALTER TABLE `columns` ADD COLUMN `verified` BOOL;ALTER TABLE `columns` RENAME COLUMN `string` TO `name`;ALTER TABLE `columns` ;ALTER TABLE `columns` DROP COLUMN `blob`;",
+			table: rel.Table{
+				Op:   rel.SchemaAlter,
+				Name: "columns",
+				Definitions: []rel.TableDefinition{
+					rel.Column{Name: "verified", Type: rel.Bool, Op: rel.SchemaCreate},
+					rel.Column{Name: "string", Rename: "name", Op: rel.SchemaRename},
+					rel.Column{Name: "bool", Type: rel.Int, Op: rel.SchemaAlter},
+					rel.Column{Name: "blob", Op: rel.SchemaDrop},
+				},
+			},
+		},
+		{
 			result: "CREATE TABLE `columns` (`bool` BOOL NOT NULL DEFAULT false, `int` INT(11) UNSIGNED, `bigint` BIGINT(20) UNSIGNED, `float` FLOAT(24) UNSIGNED, `decimal` DECIMAL(6,2) UNSIGNED, `string` VARCHAR(144) UNIQUE, `text` TEXT(1000), `date` DATE, `datetime` DATETIME DEFAULT '2020-01-01 01:00:00', `time` TIME, `blob` blob, PRIMARY KEY (`int`), FOREIGN KEY (`int`, `string`) REFERENCES `products` (`id`, `name`) ON DELETE CASCADE ON UPDATE CASCADE, UNIQUE `date_unique` (`date`)) Engine=InnoDB;",
 			table: rel.Table{
 				Op:   rel.SchemaCreate,
