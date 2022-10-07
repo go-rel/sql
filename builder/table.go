@@ -236,10 +236,14 @@ func (t Table) WriteOptions(buffer *Buffer, options string) {
 }
 
 func (t Table) filterDefinition(table rel.Table) []rel.TableDefinition {
+	if t.DefinitionFilter == nil {
+		return table.Definitions
+	}
+
 	result := []rel.TableDefinition{}
 
 	for _, def := range table.Definitions {
-		if t.DefinitionFilter == nil || t.DefinitionFilter(table, def) {
+		if t.DefinitionFilter(table, def) {
 			result = append(result, def)
 		}
 	}
