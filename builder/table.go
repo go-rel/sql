@@ -38,7 +38,7 @@ func (t Table) Build(table rel.Table) string {
 
 // WriteCreateTable query to buffer.
 func (t Table) WriteCreateTable(buffer *Buffer, table rel.Table) {
-	defs := t.filterDefinition(table)
+	defs := t.definitions(table)
 
 	buffer.WriteString("CREATE TABLE ")
 
@@ -72,7 +72,7 @@ func (t Table) WriteCreateTable(buffer *Buffer, table rel.Table) {
 
 // WriteAlterTable query to buffer.
 func (t Table) WriteAlterTable(buffer *Buffer, table rel.Table) {
-	defs := t.filterDefinition(table)
+	defs := t.definitions(table)
 
 	for _, def := range defs {
 		buffer.WriteString("ALTER TABLE ")
@@ -235,7 +235,7 @@ func (t Table) WriteOptions(buffer *Buffer, options string) {
 	buffer.WriteString(options)
 }
 
-func (t Table) filterDefinition(table rel.Table) []rel.TableDefinition {
+func (t Table) definitions(table rel.Table) []rel.TableDefinition {
 	if t.DefinitionFilter == nil {
 		return table.Definitions
 	}
