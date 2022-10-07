@@ -98,7 +98,7 @@ func TestTable_Build(t *testing.T) {
 				Op:   rel.SchemaAlter,
 				Name: "transactions",
 				Definitions: []rel.TableDefinition{
-					rel.Key{Op: rel.SchemaCreate, Columns: []string{"user_id"}, Type: rel.ForeignKey, Reference: rel.ForeignKeyReference{Table: "products", Columns: []string{"id", "name"}, OnDelete: "CASCADE", OnUpdate: "CASCADE"}},
+					rel.Key{Columns: []string{"user_id"}, Type: rel.ForeignKey, Reference: rel.ForeignKeyReference{Table: "products", Columns: []string{"id", "name"}, OnDelete: "CASCADE", OnUpdate: "CASCADE"}},
 				},
 			},
 		},
