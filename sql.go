@@ -43,7 +43,7 @@ func (s SQL) DoExec(ctx context.Context, statement string, args []interface{}) (
 	var (
 		err    error
 		result sql.Result
-		finish = s.Instrumenter.Observe(ctx, "adapter-exec", statement)
+		finish = s.Instrumenter.Observe(ctx, "adapter-exec", statement, args...)
 	)
 
 	if s.Tx != nil {
@@ -63,7 +63,7 @@ func (s SQL) DoQuery(ctx context.Context, statement string, args []interface{}) 
 		rows *sql.Rows
 	)
 
-	finish := s.Instrumenter.Observe(ctx, "adapter-query", statement)
+	finish := s.Instrumenter.Observe(ctx, "adapter-query", statement, args...)
 	if s.Tx != nil {
 		rows, err = s.Tx.QueryContext(ctx, statement, args...)
 	} else {
