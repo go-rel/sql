@@ -8,7 +8,7 @@ import (
 )
 
 type ColumnMapper func(*rel.Column) (string, int, int)
-type DefinitionFilter func(table rel.Table, def rel.TableDefinition) (bool, string)
+type DefinitionFilter func(table rel.Table, def rel.TableDefinition) bool
 
 // Table builder.
 type Table struct {
@@ -244,12 +244,10 @@ func (t Table) definitions(table rel.Table) []rel.TableDefinition {
 	result := []rel.TableDefinition{}
 
 	for _, def := range table.Definitions {
-		ok, reason := t.DefinitionFilter(table, def)
-
-		if ok {
+		if t.DefinitionFilter(table, def) {
 			result = append(result, def)
 		} else {
-			log.Print("[REL] An unsupported table definition has been excluded: " + reason)
+			log.Printf("[REL] An unsupported table definition has been excluded: %T", def)
 		}
 	}
 

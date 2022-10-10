@@ -136,15 +136,15 @@ func TestTable_Build(t *testing.T) {
 
 func TestTable_BuildWithDefinitionFilter(t *testing.T) {
 	var (
-		definitionFilter = func(table rel.Table, def rel.TableDefinition) (bool, string) {
+		definitionFilter = func(table rel.Table, def rel.TableDefinition) bool {
 			_, ok := def.(rel.Key)
 			// https://www.sqlite.org/omitted.html
 			// > Only the RENAME TABLE, ADD COLUMN, RENAME COLUMN, and DROP COLUMN variants of the ALTER TABLE command are supported.
 			if ok && table.Op == rel.SchemaAlter {
-				return false, "adapter does not support adding keys when modifying tables"
+				return false
 			}
 
-			return true, ""
+			return true
 		}
 		tableBuilder = Table{
 			BufferFactory:    BufferFactory{InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
