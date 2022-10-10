@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -141,6 +142,8 @@ func TestTable_BuildWithDefinitionFilter(t *testing.T) {
 			// https://www.sqlite.org/omitted.html
 			// > Only the RENAME TABLE, ADD COLUMN, RENAME COLUMN, and DROP COLUMN variants of the ALTER TABLE command are supported.
 			if ok && table.Op == rel.SchemaAlter {
+				log.Print("[REL] Adapter does not support adding keys when modifying tables")
+
 				return false
 			}
 
