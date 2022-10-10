@@ -37,7 +37,7 @@ func TestQuote_Value(t *testing.T) {
 	quoter := Quote{ValueQuote: "'", ValueQuoteEscapeChar: "'"}
 
 	tests := []struct {
-		value  interface{}
+		value  any
 		result string
 		panic  bool
 	}{

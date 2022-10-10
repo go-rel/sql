@@ -42,7 +42,7 @@ func TestInsert_Build(t *testing.T) {
 	assert.Contains(t, qs, "name")
 	assert.Contains(t, qs, "age")
 	assert.Contains(t, qs, "agree")
-	assert.ElementsMatch(t, []interface{}{"foo", 10, true}, args)
+	assert.ElementsMatch(t, []any{"foo", 10, true}, args)
 }
 
 func TestInsert_Build_ordinal(t *testing.T) {
@@ -64,7 +64,7 @@ func TestInsert_Build_ordinal(t *testing.T) {
 	assert.Contains(t, qs, "name")
 	assert.Contains(t, qs, "age")
 	assert.Contains(t, qs, "agree")
-	assert.ElementsMatch(t, []interface{}{"foo", 10, true}, args)
+	assert.ElementsMatch(t, []any{"foo", 10, true}, args)
 }
 
 func TestInsert_Build_defaultValuesDisabled(t *testing.T) {
@@ -77,7 +77,7 @@ func TestInsert_Build_defaultValuesDisabled(t *testing.T) {
 	)
 
 	assert.Equal(t, "INSERT INTO `users` () VALUES ();", qs)
-	assert.Equal(t, []interface{}{}, args)
+	assert.Equal(t, []any{}, args)
 }
 
 func TestInsert_Build_defaultValuesEnabled(t *testing.T) {
@@ -113,7 +113,7 @@ func TestInsert_Build_onConflictIgnore(t *testing.T) {
 	)
 
 	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON CONFLICT(`id`) IGNORE;", qs)
-	assert.Equal(t, []interface{}{1}, args)
+	assert.Equal(t, []any{1}, args)
 }
 
 func TestInsert_Build_onConflictIgnoreSelfAssign(t *testing.T) {
@@ -133,7 +133,7 @@ func TestInsert_Build_onConflictIgnoreSelfAssign(t *testing.T) {
 	)
 
 	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON DUPLICATE KEY UPDATE `id`=`id`;", qs)
-	assert.Equal(t, []interface{}{1}, args)
+	assert.Equal(t, []any{1}, args)
 }
 
 func TestInsert_Build_onConflictReplace(t *testing.T) {
@@ -155,7 +155,7 @@ func TestInsert_Build_onConflictReplace(t *testing.T) {
 	)
 
 	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON CONFLICT(`id`,`username`) DO UPDATE SET `id`=`EXCLUDED`.`id`;", qs)
-	assert.Equal(t, []interface{}{1}, args)
+	assert.Equal(t, []any{1}, args)
 }
 
 func TestInsert_Build_onConflictReplaceUseValues(t *testing.T) {
@@ -182,9 +182,9 @@ func TestInsert_Build_onConflictReplaceUseValues(t *testing.T) {
 		"INSERT INTO `users` (`id`,`name`) VALUES (?,?) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`),`id`=VALUES(`id`);",
 		"INSERT INTO `users` (`name`,`id`) VALUES (?,?) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`),`id`=VALUES(`id`);",
 	}, qs)
-	assert.Contains(t, []interface{}{
-		[]interface{}{1, "foo"},
-		[]interface{}{"foo", 1},
+	assert.Contains(t, []any{
+		[]any{1, "foo"},
+		[]any{"foo", 1},
 	}, args)
 }
 
@@ -199,10 +199,10 @@ func TestInsert_Build_onConflictFragment(t *testing.T) {
 		mutates = map[string]rel.Mutate{
 			"id": rel.Set("id", 1),
 		}
-		onConflict = rel.OnConflict{Fragment: "SET `name`=?", FragmentArgs: []interface{}{"foo"}}
+		onConflict = rel.OnConflict{Fragment: "SET `name`=?", FragmentArgs: []any{"foo"}}
 		qs, args   = insertBuilder.Build("users", "id", mutates, onConflict)
 	)
 
 	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?) ON CONFLICT SET `name`=?;", qs)
-	assert.Equal(t, []interface{}{1, "foo"}, args)
+	assert.Equal(t, []any{1, "foo"}, args)
 }

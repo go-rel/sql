@@ -367,7 +367,7 @@ func Updates(t *testing.T, repo rel.Repository) {
 	repo.MustInsert(ctx, &user)
 	repo.MustInsert(ctx, &address)
 
-	tests := []interface{}{
+	tests := []any{
 		&User{ID: user.ID, Name: "changed", Age: 100},
 		&User{ID: user.ID, Name: "changed", Age: 100, Note: &note},
 		&User{ID: user.ID, Note: &note},

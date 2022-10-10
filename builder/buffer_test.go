@@ -82,7 +82,7 @@ func TestBuffer_escape(t *testing.T) {
 func TestBuffer_Arguments(t *testing.T) {
 	var (
 		buffer           = Buffer{Quoter: Quote{IDPrefix: "[", IDSuffix: "]"}}
-		initialArguments = []interface{}{1}
+		initialArguments = []any{1}
 	)
 
 	assert.Nil(t, buffer.Arguments())
@@ -91,7 +91,7 @@ func TestBuffer_Arguments(t *testing.T) {
 	assert.Equal(t, initialArguments, buffer.Arguments())
 
 	buffer.AddArguments(2)
-	assert.Equal(t, []interface{}{1, 2}, buffer.Arguments())
+	assert.Equal(t, []any{1, 2}, buffer.Arguments())
 
 	buffer.Reset()
 	assert.Nil(t, buffer.Arguments())
@@ -117,7 +117,7 @@ func TestBuffer_InlineValue(t *testing.T) {
 	bf := BufferFactory{InlineValues: true, BoolTrueValue: "1", BoolFalseValue: "0", Quoter: Quote{ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 
 	tests := []struct {
-		value  interface{}
+		value  any
 		result string
 	}{
 		{
