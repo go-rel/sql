@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"log"
 	"strconv"
 
 	"github.com/go-rel/rel"
@@ -245,6 +246,8 @@ func (t Table) definitions(table rel.Table) []rel.TableDefinition {
 	for _, def := range table.Definitions {
 		if t.DefinitionFilter(table, def) {
 			result = append(result, def)
+		} else {
+			log.Print("[REL] An unsupported table definition has been excluded")
 		}
 	}
 
