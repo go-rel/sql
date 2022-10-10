@@ -52,12 +52,12 @@ func TestInsertAll_Build(t *testing.T) {
 
 	statement, args := insertAllBuilder.Build("users", "id", []string{"name"}, bulkMutates, rel.OnConflict{})
 	assert.Equal(t, "INSERT INTO `users` (`name`) VALUES (?),(DEFAULT),(?);", statement)
-	assert.Equal(t, []interface{}{"foo", "boo"}, args)
+	assert.Equal(t, []any{"foo", "boo"}, args)
 
 	// with age
 	statement, args = insertAllBuilder.Build("users", "id", []string{"name", "age"}, bulkMutates, rel.OnConflict{})
 	assert.Equal(t, "INSERT INTO `users` (`name`,`age`) VALUES (?,DEFAULT),(DEFAULT,?),(?,?);", statement)
-	assert.Equal(t, []interface{}{"foo", 10, "boo", 20}, args)
+	assert.Equal(t, []any{"foo", 10, "boo", 20}, args)
 }
 
 func TestInsertAll_Build_ordinal(t *testing.T) {
@@ -82,12 +82,12 @@ func TestInsertAll_Build_ordinal(t *testing.T) {
 
 	statement, args := insertAllBuilder.Build("users", "id", []string{"name"}, bulkMutates, rel.OnConflict{})
 	assert.Equal(t, "INSERT INTO \"users\" (\"name\") VALUES ($1),(DEFAULT),($2) RETURNING \"id\";", statement)
-	assert.Equal(t, []interface{}{"foo", "boo"}, args)
+	assert.Equal(t, []any{"foo", "boo"}, args)
 
 	// with age
 	statement, args = insertAllBuilder.Build("users", "id", []string{"name", "age"}, bulkMutates, rel.OnConflict{})
 	assert.Equal(t, "INSERT INTO \"users\" (\"name\",\"age\") VALUES ($1,DEFAULT),(DEFAULT,$2),($3,$4) RETURNING \"id\";", statement)
-	assert.Equal(t, []interface{}{"foo", 10, "boo", 20}, args)
+	assert.Equal(t, []any{"foo", 10, "boo", 20}, args)
 }
 
 func TestInsertAll_Build_onConflictIgnore(t *testing.T) {
@@ -113,7 +113,7 @@ func TestInsertAll_Build_onConflictIgnore(t *testing.T) {
 	)
 
 	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?),(?) ON CONFLICT(`id`) IGNORE;", qs)
-	assert.Equal(t, []interface{}{1, 2}, args)
+	assert.Equal(t, []any{1, 2}, args)
 }
 
 func TestInsertAll_Build_onConflictReplace(t *testing.T) {
@@ -140,7 +140,7 @@ func TestInsertAll_Build_onConflictReplace(t *testing.T) {
 	)
 
 	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?),(?) ON CONFLICT(`id`,`username`) DO UPDATE SET `id`=`EXCLUDED`.`id`;", qs)
-	assert.Equal(t, []interface{}{1, 2}, args)
+	assert.Equal(t, []any{1, 2}, args)
 }
 
 func TestInsertAll_Build_onConflictFragment(t *testing.T) {
@@ -159,10 +159,10 @@ func TestInsertAll_Build_onConflictFragment(t *testing.T) {
 				"id": rel.Set("id", 2),
 			},
 		}
-		onConflict = rel.OnConflict{Fragment: "SET `name`=?", FragmentArgs: []interface{}{"foo"}}
+		onConflict = rel.OnConflict{Fragment: "SET `name`=?", FragmentArgs: []any{"foo"}}
 		qs, args   = insertAllBuilder.Build("users", "id", []string{"id"}, bulkMutates, onConflict)
 	)
 
 	assert.Equal(t, "INSERT INTO `users` (`id`) VALUES (?),(?) ON CONFLICT SET `name`=?;", qs)
-	assert.Equal(t, []interface{}{1, 2, "foo"}, args)
+	assert.Equal(t, []any{1, 2, "foo"}, args)
 }
