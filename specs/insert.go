@@ -152,7 +152,7 @@ func Inserts(t *testing.T, repo rel.Repository) {
 
 	repo.MustInsert(ctx, &user)
 
-	tests := []interface{}{
+	tests := []any{
 		&User{},
 		&User{Name: "insert", Age: 100},
 		&User{Name: "insert", Age: 100, Note: &note},
@@ -176,7 +176,7 @@ func Inserts(t *testing.T, repo rel.Repository) {
 	}
 }
 
-func assertRecord(t *testing.T, repo rel.Repository, record interface{}) {
+func assertRecord(t *testing.T, repo rel.Repository, record any) {
 	switch v := record.(type) {
 	case *User:
 		var found User
@@ -204,7 +204,7 @@ func InsertAll(t *testing.T, repo rel.Repository) {
 
 	repo.MustInsert(ctx, &user)
 
-	tests := []interface{}{
+	tests := []any{
 		&[]User{{}},
 		&[]User{{Name: "insert", Age: 100}},
 		&[]User{{Name: "insert", Age: 100, Note: &note}},
@@ -231,7 +231,7 @@ func InsertAll(t *testing.T, repo rel.Repository) {
 
 // InsertAllPartialCustomPrimary tests insert multiple specifications.
 func InsertAllPartialCustomPrimary(t *testing.T, repo rel.Repository) {
-	tests := []interface{}{
+	tests := []any{
 		&[]User{{ID: 300, Name: "insert 300", Age: 100}, {Name: "insert 300+?"}},
 		&[]User{{Name: "insert 305-?", Age: 100}, {ID: 305, Name: "insert 305+?"}},
 		&[]User{{Name: "insert 310-?"}, {ID: 310, Name: "insert 310", Age: 100}, {Name: "insert 300+?"}},
@@ -303,7 +303,7 @@ func InsertAllOnConflictReplace(t *testing.T, repo rel.Repository) {
 	assertRecords(t, repo, &reInsert)
 }
 
-func assertRecords(t *testing.T, repo rel.Repository, records interface{}) {
+func assertRecords(t *testing.T, repo rel.Repository, records any) {
 	switch v := records.(type) {
 	case *[]User:
 		var (

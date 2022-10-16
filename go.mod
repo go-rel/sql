@@ -1,6 +1,6 @@
 module github.com/go-rel/sql
 
-go 1.16
+go 1.15
 
 require (
 	github.com/go-rel/rel v0.38.0

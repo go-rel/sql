@@ -20,11 +20,11 @@ func TestDelete_Builder(t *testing.T) {
 
 	qs, args := deleteBuilder.Build("users", where.And())
 	assert.Equal(t, "DELETE FROM `users`;", qs)
-	assert.Equal(t, []interface{}(nil), args)
+	assert.Equal(t, []any(nil), args)
 
 	qs, args = deleteBuilder.Build("users", where.Eq("id", 1))
 	assert.Equal(t, "DELETE FROM `users` WHERE `users`.`id`=?;", qs)
-	assert.Equal(t, []interface{}{1}, args)
+	assert.Equal(t, []any{1}, args)
 }
 
 func TestDelete_Builder_ordinal(t *testing.T) {
@@ -40,9 +40,9 @@ func TestDelete_Builder_ordinal(t *testing.T) {
 
 	qs, args := deleteBuilder.Build("users", where.And())
 	assert.Equal(t, "DELETE FROM \"users\";", qs)
-	assert.Equal(t, []interface{}(nil), args)
+	assert.Equal(t, []any(nil), args)
 
 	qs, args = deleteBuilder.Build("users", where.Eq("id", 1))
 	assert.Equal(t, "DELETE FROM \"users\" WHERE \"users\".\"id\"=$1;", qs)
-	assert.Equal(t, []interface{}{1}, args)
+	assert.Equal(t, []any{1}, args)
 }

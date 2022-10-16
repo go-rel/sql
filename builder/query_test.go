@@ -41,7 +41,7 @@ func TestQuery_Build(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		query  rel.Query
 	}{
 		{
@@ -70,12 +70,12 @@ func TestQuery_Build(t *testing.T) {
 		},
 		{
 			result: "SELECT `users`.* FROM `users` WHERE `users`.`id`=?;",
-			args:   []interface{}{10},
+			args:   []any{10},
 			query:  query.Where(where.Eq("id", 10)),
 		},
 		{
 			result: "SELECT DISTINCT `users`.* FROM `users` GROUP BY `users`.`type` HAVING `users`.`price`>?;",
-			args:   []interface{}{1000},
+			args:   []any{1000},
 			query:  query.Distinct().Group("type").Having(where.Gt("price", 1000)),
 		},
 		{
@@ -84,7 +84,7 @@ func TestQuery_Build(t *testing.T) {
 		},
 		{
 			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id` AND (`transactions`.`status`=? AND `users`.`type`=?) WHERE `users`.`id`=?;",
-			args:   []interface{}{1, 2, 10},
+			args:   []any{1, 2, 10},
 			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id", rel.Eq("status", 1), rel.Eq("users.type", 2)).Where(rel.Eq("id", 10)),
 		},
 		{
@@ -128,7 +128,7 @@ func TestQuery_Build_ordinal(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		query  rel.Query
 	}{
 		{
@@ -157,12 +157,12 @@ func TestQuery_Build_ordinal(t *testing.T) {
 		},
 		{
 			result: "SELECT \"users\".* FROM \"users\" WHERE \"users\".\"id\"=$1;",
-			args:   []interface{}{10},
+			args:   []any{10},
 			query:  query.Where(where.Eq("id", 10)),
 		},
 		{
 			result: "SELECT DISTINCT \"users\".* FROM \"users\" GROUP BY \"users\".\"type\" HAVING \"users\".\"price\">$1;",
-			args:   []interface{}{1000},
+			args:   []any{1000},
 			query:  query.Distinct().Group("type").Having(where.Gt("price", 1000)),
 		},
 		{
@@ -210,7 +210,7 @@ func TestQuery_Build_SQLQuery(t *testing.T) {
 	)
 
 	assert.Equal(t, "SELECT * FROM `users` WHERE id=?;", qs)
-	assert.Equal(t, []interface{}{1}, args)
+	assert.Equal(t, []any{1}, args)
 }
 
 func TestQuery_WriteSelect(t *testing.T) {
@@ -293,7 +293,7 @@ func TestQuery_WriteJoin(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		query  rel.Query
 	}{
 		{
@@ -320,7 +320,7 @@ func TestQuery_WriteJoin(t *testing.T) {
 			result: " JOIN `users` ON `users`.`id`=`transactions`.`user_id` JOIN `payments` ON `payments`.`id`=`transactions`.`payment_id` AND `payments`.`deleted`=?",
 			query: rel.From("transactions").JoinOn("users", "users.id", "transactions.user_id").
 				JoinOn("payments", "payments.id", "transactions.payment_id", rel.Eq("deleted", false)),
-			args: []interface{}{false},
+			args: []any{false},
 		},
 	}
 
@@ -346,18 +346,18 @@ func TestQuery_WriteWhere(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		table  string
 		filter rel.FilterQuery
 	}{
 		{
 			result: " WHERE `field`=?",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field", "value"),
 		},
 		{
 			result: " WHERE (`field1`=? AND `field2`=?)",
-			args:   []interface{}{"value1", "value2"},
+			args:   []any{"value1", "value2"},
 			filter: where.Eq("field1", "value1").AndEq("field2", "value2"),
 		},
 	}
@@ -384,18 +384,18 @@ func TestQuery_WriteWhere_ordinal(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		table  string
 		filter rel.FilterQuery
 	}{
 		{
 			result: " WHERE \"field\"=$1",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field", "value"),
 		},
 		{
 			result: " WHERE (\"field1\"=$1 AND \"field2\"=$2)",
-			args:   []interface{}{"value1", "value2"},
+			args:   []any{"value1", "value2"},
 			filter: where.Eq("field1", "value1").AndEq("field2", "value2"),
 		},
 	}
@@ -422,27 +422,27 @@ func TestQuery_WriteWhere_SubQuery(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		table  string
 		filter rel.FilterQuery
 	}{
 		{
 			result: " WHERE `field`=ANY(SELECT `table2`.`field1` FROM `table2` WHERE `table2`.`type`=?)",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field", rel.Any(
 				rel.Select("field1").From("table2").Where(where.Eq("type", "value")),
 			)),
 		},
 		{
 			result: " WHERE `field`=(SELECT `table2`.`field1` FROM `table2` WHERE `table2`.`type`=?)",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field",
 				rel.Select("field1").From("table2").Where(where.Eq("type", "value")),
 			),
 		},
 		{
 			result: " WHERE `field1` IN (SELECT `table2`.`field2` FROM `table2` WHERE `table2`.`field3` IN (?,?))",
-			args:   []interface{}{"value1", "value2"},
+			args:   []any{"value1", "value2"},
 			filter: where.In("field1", rel.Select("field2").From("table2").Where(
 				where.InString("field3", []string{"value1", "value2"}),
 			)),
@@ -471,27 +471,27 @@ func TestQuery_WriteWhere_SubQuery_ordinal(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		table  string
 		filter rel.FilterQuery
 	}{
 		{
 			result: " WHERE \"field1\"=ANY(SELECT \"table2\".\"field2\" FROM \"table2\" WHERE \"table2\".\"type\"=$1)",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field1", rel.Any(
 				rel.Select("field2").From("table2").Where(where.Eq("type", "value")),
 			)),
 		},
 		{
 			result: " WHERE \"field1\"=(SELECT \"table2\".\"field2\" FROM \"table2\" WHERE \"table2\".\"type\"=$1)",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field1",
 				rel.Select("field2").From("table2").Where(where.Eq("type", "value")),
 			),
 		},
 		{
 			result: " WHERE \"field1\" IN (SELECT \"table2\".\"field2\" FROM \"table2\" WHERE \"table2\".\"field3\" IN ($1,$2))",
-			args:   []interface{}{"value1", "value2"},
+			args:   []any{"value1", "value2"},
 			filter: where.In("field1",
 				rel.Select("field2").From("table2").Where(
 					where.InString("field3", []string{"value1", "value2"}),
@@ -547,18 +547,18 @@ func TestQuery_WriteHaving(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		table  string
 		filter rel.FilterQuery
 	}{
 		{
 			result: " HAVING `field`=?",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field", "value"),
 		},
 		{
 			result: " HAVING (`field1`=? AND `field2`=?)",
-			args:   []interface{}{"value1", "value2"},
+			args:   []any{"value1", "value2"},
 			filter: where.Eq("field1", "value1").AndEq("field2", "value2"),
 		},
 		{
@@ -589,18 +589,18 @@ func TestQuery_WriteHaving_ordinal(t *testing.T) {
 
 	tests := []struct {
 		result string
-		args   []interface{}
+		args   []any
 		table  string
 		filter rel.FilterQuery
 	}{
 		{
 			result: " HAVING \"field\"=$1",
-			args:   []interface{}{"value"},
+			args:   []any{"value"},
 			filter: where.Eq("field", "value"),
 		},
 		{
 			result: " HAVING (\"field1\"=$1 AND \"field2\"=$2)",
-			args:   []interface{}{"value1", "value2"},
+			args:   []any{"value1", "value2"},
 			filter: where.Eq("field1", "value1").AndEq("field2", "value2"),
 		},
 	}
