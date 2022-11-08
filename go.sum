@@ -4,10 +4,10 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=
-github.com/go-rel/rel v0.39.0 h1:2zmK8kazM82iRRfWX7+mm1MxDkGKDj2W+xJLjguli5U=
-github.com/go-rel/rel v0.39.0/go.mod h1:yN6+aimHyRIzbuWFe5DaxiZPuVuPfd7GlLpy/YTqTUg=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
+github.com/lafriks-fork/rel v0.39.1-0.20221108214643-1b07f1a5dddc h1:DfFCMkOmGZw67NjY95zYLNLt13kW+P5+nM8pQUKR4c8=
+github.com/lafriks-fork/rel v0.39.1-0.20221108214643-1b07f1a5dddc/go.mod h1:ZmXMIRDQHbw29qOfWtO6HSq1UqNxthlsjmt++3FZSDs=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/nxadm/tail v1.4.8/go.mod h1:+ncqLTQzXmGhMZNUePPaPqPvBxHAIsmXswZKocGu+AU=
 github.com/onsi/ginkgo v1.15.0 h1:1V1NfVQR87RtWAgp1lv9JZJ5Jap+XFGKPi00andXGi4=

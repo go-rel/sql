@@ -10,12 +10,10 @@ import (
 )
 
 func TestTable_Build(t *testing.T) {
-	var (
-		tableBuilder = Table{
-			BufferFactory: BufferFactory{InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
-			ColumnMapper:  sql.ColumnMapper,
-		}
-	)
+	tableBuilder := Table{
+		BufferFactory: BufferFactory{InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+		ColumnMapper:  sql.ColumnMapper,
+	}
 
 	tests := []struct {
 		result string
@@ -80,14 +78,13 @@ func TestTable_Build(t *testing.T) {
 			},
 		},
 		{
-			result: "ALTER TABLE `columns` ADD COLUMN `verified` BOOL;ALTER TABLE `columns` RENAME COLUMN `string` TO `name`;ALTER TABLE `columns` ;ALTER TABLE `columns` DROP COLUMN `blob`;",
+			result: "ALTER TABLE `columns` ADD COLUMN `verified` BOOL;ALTER TABLE `columns` RENAME COLUMN `string` TO `name`;ALTER TABLE `columns` DROP COLUMN `blob`;",
 			table: rel.Table{
 				Op:   rel.SchemaAlter,
 				Name: "columns",
 				Definitions: []rel.TableDefinition{
 					rel.Column{Name: "verified", Type: rel.Bool, Op: rel.SchemaCreate},
 					rel.Column{Name: "string", Rename: "name", Op: rel.SchemaRename},
-					rel.Column{Name: "bool", Type: rel.Int, Op: rel.SchemaAlter},
 					rel.Column{Name: "blob", Op: rel.SchemaDrop},
 				},
 			},
@@ -99,6 +96,29 @@ func TestTable_Build(t *testing.T) {
 				Name: "transactions",
 				Definitions: []rel.TableDefinition{
 					rel.Key{Columns: []string{"user_id"}, Type: rel.ForeignKey, Reference: rel.ForeignKeyReference{Table: "products", Columns: []string{"id", "name"}, OnDelete: "CASCADE", OnUpdate: "CASCADE"}},
+				},
+			},
+		},
+		{
+			result: "ALTER TABLE `columns` ALTER COLUMN `name` TYPE VARCHAR(100);",
+			table: rel.Table{
+				Op:   rel.SchemaAlter,
+				Name: "columns",
+				Definitions: []rel.TableDefinition{
+					rel.Column{Name: "name", Type: rel.String, Limit: 100, Op: rel.SchemaAlter, Constr: rel.AlterColumnType},
+				},
+			},
+		},
+		{
+			result: "ALTER TABLE `columns` ALTER COLUMN `bool` SET DEFAULT 1;ALTER TABLE `columns` ALTER COLUMN `bool` SET NOT NULL;ALTER TABLE `columns` ALTER COLUMN `verified` DROP DEFAULT;ALTER TABLE `columns` ALTER COLUMN `verified` DROP NOT NULL;",
+			table: rel.Table{
+				Op:   rel.SchemaAlter,
+				Name: "columns",
+				Definitions: []rel.TableDefinition{
+					rel.Column{Name: "bool", Default: 1, Op: rel.SchemaAlter, Constr: rel.AlterColumnDefault},
+					rel.Column{Name: "bool", Required: true, Op: rel.SchemaAlter, Constr: rel.AlterColumnRequired},
+					rel.Column{Name: "verified", Default: nil, Op: rel.SchemaAlter, Constr: rel.AlterColumnDefault},
+					rel.Column{Name: "verified", Op: rel.SchemaAlter, Constr: rel.AlterColumnRequired},
 				},
 			},
 		},
@@ -143,6 +163,11 @@ func TestTable_BuildWithDefinitionFilter(t *testing.T) {
 			if ok && table.Op == rel.SchemaAlter {
 				return false
 			}
+			// > Other kinds of ALTER TABLE operations such as ALTER COLUMN, ADD CONSTRAINT, and so forth are omitted.
+			col, ok := def.(rel.Column)
+			if ok && col.Op == rel.SchemaAlter {
+				return false
+			}
 
 			return true
 		}
@@ -182,15 +207,37 @@ func TestTable_BuildWithDefinitionFilter(t *testing.T) {
 			},
 		},
 		{
-			result: "ALTER TABLE `columns` ADD COLUMN `verified` BOOL;ALTER TABLE `columns` RENAME COLUMN `string` TO `name`;ALTER TABLE `columns` ;ALTER TABLE `columns` DROP COLUMN `blob`;",
+			result: "ALTER TABLE `columns` ADD COLUMN `verified` BOOL;ALTER TABLE `columns` RENAME COLUMN `string` TO `name`;ALTER TABLE `columns` DROP COLUMN `blob`;",
 			table: rel.Table{
 				Op:   rel.SchemaAlter,
 				Name: "columns",
 				Definitions: []rel.TableDefinition{
 					rel.Column{Name: "verified", Type: rel.Bool, Op: rel.SchemaCreate},
 					rel.Column{Name: "string", Rename: "name", Op: rel.SchemaRename},
-					rel.Column{Name: "bool", Type: rel.Int, Op: rel.SchemaAlter},
 					rel.Column{Name: "blob", Op: rel.SchemaDrop},
+				},
+			},
+		},
+		{
+			result: "",
+			table: rel.Table{
+				Op:   rel.SchemaAlter,
+				Name: "columns",
+				Definitions: []rel.TableDefinition{
+					rel.Column{Name: "name", Type: rel.String, Limit: 100, Op: rel.SchemaAlter, Constr: rel.AlterColumnType},
+				},
+			},
+		},
+		{
+			result: "",
+			table: rel.Table{
+				Op:   rel.SchemaAlter,
+				Name: "columns",
+				Definitions: []rel.TableDefinition{
+					rel.Column{Name: "bool", Default: 1, Op: rel.SchemaAlter, Constr: rel.AlterColumnDefault},
+					rel.Column{Name: "bool", Required: true, Op: rel.SchemaAlter, Constr: rel.AlterColumnRequired},
+					rel.Column{Name: "verified", Default: nil, Op: rel.SchemaAlter, Constr: rel.AlterColumnDefault},
+					rel.Column{Name: "verified", Op: rel.SchemaAlter, Constr: rel.AlterColumnRequired},
 				},
 			},
 		},
