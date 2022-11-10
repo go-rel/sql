@@ -652,13 +652,13 @@ func TestQuery_WriteLimitOffset(t *testing.T) {
 
 	t.Run("limit", func(t *testing.T) {
 		buffer := bufferFactory.Create()
-		queryBuilder.WriteLimitOffet(&buffer, 10, 0)
+		queryBuilder.WriteLimitOffset(&buffer, 10, 0)
 		assert.Equal(t, " LIMIT 10", buffer.String())
 	})
 
 	t.Run("limit and offset", func(t *testing.T) {
 		buffer := bufferFactory.Create()
-		queryBuilder.WriteLimitOffet(&buffer, 10, 10)
+		queryBuilder.WriteLimitOffset(&buffer, 10, 10)
 		assert.Equal(t, " LIMIT 10 OFFSET 10", buffer.String())
 	})
 }
