@@ -19,3 +19,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/go-rel/rel v0.39.0 => github.com/lafriks-fork/rel v0.39.1-0.20221108214643-1b07f1a5dddc

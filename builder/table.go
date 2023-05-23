@@ -7,8 +7,10 @@ import (
 	"github.com/go-rel/rel"
 )
 
-type ColumnMapper func(*rel.Column) (string, int, int)
-type DefinitionFilter func(table rel.Table, def rel.TableDefinition) bool
+type (
+	ColumnMapper     func(*rel.Column) (string, int, int)
+	DefinitionFilter func(table rel.Table, def rel.TableDefinition) bool
+)
 
 // Table builder.
 type Table struct {
@@ -19,9 +21,7 @@ type Table struct {
 
 // Build SQL query for table creation and modification.
 func (t Table) Build(table rel.Table) string {
-	var (
-		buffer = t.BufferFactory.Create()
-	)
+	buffer := t.BufferFactory.Create()
 
 	switch table.Op {
 	case rel.SchemaCreate:
@@ -86,6 +86,10 @@ func (t Table) WriteAlterTable(buffer *Buffer, table rel.Table) {
 			case rel.SchemaCreate:
 				buffer.WriteString("ADD COLUMN ")
 				t.WriteColumn(buffer, v)
+			case rel.SchemaAlter:
+				buffer.WriteString("ALTER COLUMN ")
+				buffer.WriteEscape(v.Name)
+				t.WriteAlterColumn(buffer, v)
 			case rel.SchemaRename:
 				// Add Change
 				buffer.WriteString("RENAME COLUMN ")
@@ -131,14 +135,10 @@ func (t Table) WriteDropTable(buffer *Buffer, table rel.Table) {
 	buffer.WriteByte(';')
 }
 
-// WriteColumn definition to buffer.
-func (t Table) WriteColumn(buffer *Buffer, column rel.Column) {
-	var (
-		typ, m, n = t.ColumnMapper(&column)
-	)
+// WriteColumnType definition to buffer.
+func (t Table) WriteColumnType(buffer *Buffer, column rel.Column) {
+	typ, m, n := t.ColumnMapper(&column)
 
-	buffer.WriteEscape(column.Name)
-	buffer.WriteByte(' ')
 	buffer.WriteString(typ)
 
 	if m != 0 {
@@ -156,6 +156,14 @@ func (t Table) WriteColumn(buffer *Buffer, column rel.Column) {
 	if column.Unsigned {
 		buffer.WriteString(" UNSIGNED")
 	}
+}
+
+// WriteColumn definition to buffer.
+func (t Table) WriteColumn(buffer *Buffer, column rel.Column) {
+	buffer.WriteEscape(column.Name)
+	buffer.WriteByte(' ')
+
+	t.WriteColumnType(buffer, column)
 
 	if column.Unique {
 		buffer.WriteString(" UNIQUE")
@@ -177,11 +185,31 @@ func (t Table) WriteColumn(buffer *Buffer, column rel.Column) {
 	t.WriteOptions(buffer, column.Options)
 }
 
+// WriteAlterColumn definition to buffer.
+func (t Table) WriteAlterColumn(buffer *Buffer, column rel.Column) {
+	switch column.Constr {
+	case rel.AlterColumnType:
+		buffer.WriteString(" TYPE ")
+		t.WriteColumnType(buffer, column)
+	case rel.AlterColumnDefault:
+		if column.Default != nil {
+			buffer.WriteString(" SET DEFAULT ")
+			buffer.WriteValue(column.Default)
+		} else {
+			buffer.WriteString(" DROP DEFAULT")
+		}
+	case rel.AlterColumnRequired:
+		if column.Required {
+			buffer.WriteString(" SET NOT NULL")
+		} else {
+			buffer.WriteString(" DROP NOT NULL")
+		}
+	}
+}
+
 // WriteKey definition to buffer.
 func (t Table) WriteKey(buffer *Buffer, key rel.Key) {
-	var (
-		typ = string(key.Type)
-	)
+	typ := string(key.Type)
 
 	buffer.WriteString(typ)
 
