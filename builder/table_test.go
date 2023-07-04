@@ -14,6 +14,7 @@ func TestTable_Build(t *testing.T) {
 		tableBuilder = Table{
 			BufferFactory: BufferFactory{InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
 			ColumnMapper:  sql.ColumnMapper,
+			DropKeyMapper: sql.DropKeyMapper,
 		}
 	)
 
@@ -99,6 +100,16 @@ func TestTable_Build(t *testing.T) {
 				Name: "transactions",
 				Definitions: []rel.TableDefinition{
 					rel.Key{Columns: []string{"user_id"}, Type: rel.ForeignKey, Reference: rel.ForeignKeyReference{Table: "products", Columns: []string{"id", "name"}, OnDelete: "CASCADE", OnUpdate: "CASCADE"}},
+				},
+			},
+		},
+		{
+			result: "ALTER TABLE `transactions` DROP CONSTRAINT `fk`;",
+			table: rel.Table{
+				Op:   rel.SchemaAlter,
+				Name: "transactions",
+				Definitions: []rel.TableDefinition{
+					rel.Key{Op: rel.SchemaDrop, Name: "fk", Type: rel.ForeignKey},
 				},
 			},
 		},
