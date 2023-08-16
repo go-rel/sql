@@ -9,7 +9,7 @@ import (
 )
 
 func TestBuffer_escape(t *testing.T) {
-	buffer := Buffer{Quoter: Quote{IDPrefix: "[", IDSuffix: "]"}}
+	buffer := Buffer{AllowTableSchema: true, Quoter: Quote{IDPrefix: "[", IDSuffix: "]"}}
 
 	tests := []struct {
 		table  string
@@ -23,6 +23,10 @@ func TestBuffer_escape(t *testing.T) {
 		{
 			field:  "user.address as home_address",
 			result: "[user].[address] AS [home_address]",
+		},
+		{
+			field:  "public.user.address as home_address",
+			result: "[public].[user].[address] AS [home_address]",
 		},
 		{
 			table:  "ignored",
@@ -70,9 +74,7 @@ func TestBuffer_escape(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				result = buffer.escape(test.table, test.field)
-			)
+			result := buffer.escape(test.table, test.field)
 
 			assert.Equal(t, test.result, result)
 		})

@@ -9,7 +9,7 @@ import (
 
 func TestIndex_Build(t *testing.T) {
 	var (
-		bufferFactory = BufferFactory{ArgumentPlaceholder: "?", InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
+		bufferFactory = BufferFactory{AllowTableSchema: true, ArgumentPlaceholder: "?", InlineValues: true, BoolTrueValue: "true", BoolFalseValue: "false", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}}
 		filter        = Filter{}
 		indexBuilder  = Index{
 			BufferFactory:    bufferFactory,
@@ -118,6 +118,16 @@ func TestIndex_Build(t *testing.T) {
 				Name:     "index",
 				Table:    "table",
 				Optional: true,
+			},
+		},
+		{
+			result: "CREATE INDEX IF NOT EXISTS `index` ON `schema`.`table` (`column1`);",
+			index: rel.Index{
+				Op:       rel.SchemaCreate,
+				Table:    "schema.table",
+				Name:     "index",
+				Optional: true,
+				Columns:  []string{"column1"},
 			},
 		},
 	}
