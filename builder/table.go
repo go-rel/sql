@@ -8,17 +8,19 @@ import (
 )
 
 type (
-	ColumnMapper     func(*rel.Column) (string, int, int)
-	DropKeyMapper    func(rel.KeyType) string
-	DefinitionFilter func(table rel.Table, def rel.TableDefinition) bool
+	ColumnMapper        func(*rel.Column) (string, int, int)
+	ColumnOptionsMapper func(*rel.Column) string
+	DropKeyMapper       func(rel.KeyType) string
+	DefinitionFilter    func(table rel.Table, def rel.TableDefinition) bool
 )
 
 // Table builder.
 type Table struct {
-	BufferFactory    BufferFactory
-	ColumnMapper     ColumnMapper
-	DropKeyMapper    DropKeyMapper
-	DefinitionFilter DefinitionFilter
+	BufferFactory       BufferFactory
+	ColumnMapper        ColumnMapper
+	ColumnOptionsMapper ColumnOptionsMapper
+	DropKeyMapper       DropKeyMapper
+	DefinitionFilter    DefinitionFilter
 }
 
 // Build SQL query for table creation and modification.
@@ -158,20 +160,9 @@ func (t Table) WriteColumn(buffer *Buffer, column rel.Column) {
 		buffer.WriteByte(')')
 	}
 
-	if column.Unsigned {
-		buffer.WriteString(" UNSIGNED")
-	}
-
-	if column.Unique {
-		buffer.WriteString(" UNIQUE")
-	}
-
-	if column.Required {
-		buffer.WriteString(" NOT NULL")
-	}
-
-	if column.Primary {
-		buffer.WriteString(" PRIMARY KEY")
+	if opts := t.ColumnOptionsMapper(&column); opts != "" {
+		buffer.WriteByte(' ')
+		buffer.WriteString(opts)
 	}
 
 	if column.Default != nil {
