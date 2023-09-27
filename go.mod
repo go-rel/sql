@@ -1,6 +1,8 @@
 module github.com/go-rel/sql
 
-go 1.19
+go 1.21
+
+toolchain go1.21.0
 
 require (
 	github.com/go-rel/rel v0.40.0
