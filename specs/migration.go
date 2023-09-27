@@ -15,7 +15,7 @@ func Setup(repo rel.Repository) func() {
 	m.Register(1,
 		func(schema *rel.Schema) {
 			schema.CreateTable("users", func(t *rel.Table) {
-				t.ID("id")
+				t.ID("id", rel.Primary(true))
 				t.String("slug", rel.Limit(30))
 				t.String("name", rel.Limit(30), rel.Default(""))
 				t.String("gender", rel.Limit(10), rel.Default(""))
