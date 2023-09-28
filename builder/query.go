@@ -109,10 +109,16 @@ func (q Query) WriteJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
 			to   = join.To
 		)
 
+		jtable := join.Table
+		// If join table has alias use that for filter conditions
+		if i := strings.Index(strings.ToLower(jtable), " as "); i > -1 {
+			jtable = jtable[i+4:]
+		}
+
 		// TODO: move this to core functionality, and infer join condition using assoc data.
 		if join.Arguments == nil && (join.From == "" || join.To == "") {
 			from = table + "." + strings.TrimSuffix(join.Table, "s") + "_id"
-			to = join.Table + ".id"
+			to = jtable + ".id"
 		}
 
 		buffer.WriteByte(' ')
@@ -127,7 +133,7 @@ func (q Query) WriteJoin(buffer *Buffer, table string, joins []rel.JoinQuery) {
 			buffer.WriteEscape(to)
 			if !join.Filter.None() {
 				buffer.WriteString(" AND ")
-				q.Filter.Write(buffer, join.Table, join.Filter, q)
+				q.Filter.Write(buffer, jtable, join.Filter, q)
 			}
 		}
 

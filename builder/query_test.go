@@ -10,12 +10,10 @@ import (
 )
 
 func BenchmarkQuery_Build(b *testing.B) {
-	var (
-		queryBuilder = Query{
-			BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
-			Filter:        Filter{},
-		}
-	)
+	queryBuilder := Query{
+		BufferFactory: BufferFactory{ArgumentPlaceholder: "?", Quoter: Quote{IDPrefix: "`", IDSuffix: "`", IDSuffixEscapeChar: "`", ValueQuote: "'", ValueQuoteEscapeChar: "'"}},
+		Filter:        Filter{},
+	}
 
 	for n := 0; n < b.N; n++ {
 		query := rel.From("users").
@@ -83,9 +81,13 @@ func TestQuery_Build(t *testing.T) {
 			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id"),
 		},
 		{
-			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id` AND (`transactions`.`status`=? AND `users`.`type`=?) WHERE `users`.`id`=?;",
+			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` ON `transactions`.`id`=`users`.`transaction_id`;",
+			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id"),
+		},
+		{
+			result: "SELECT `users`.* FROM `users` INNER JOIN `transactions` AS `t` ON `transactions`.`id`=`users`.`transaction_id` AND (`t`.`status`=? AND `users`.`type`=?) WHERE `users`.`id`=?;",
 			args:   []any{1, 2, 10},
-			query:  query.JoinWith("INNER JOIN", "transactions", "transactions.id", "users.transaction_id", rel.Eq("status", 1), rel.Eq("users.type", 2)).Where(rel.Eq("id", 10)),
+			query:  query.JoinWith("INNER JOIN", "transactions as t", "transactions.id", "users.transaction_id", rel.Eq("t.status", 1), rel.Eq("users.type", 2)).Where(rel.Eq("id", 10)),
 		},
 		{
 			result: "SELECT `users`.* FROM `users` ORDER BY `users`.`created_at` ASC;",
@@ -107,9 +109,7 @@ func TestQuery_Build(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				result, args = queryBuilder.Build(test.query)
-			)
+			result, args := queryBuilder.Build(test.query)
 
 			assert.Equal(t, test.result, result)
 			assert.Equal(t, test.args, args)
@@ -189,9 +189,7 @@ func TestQuery_Build_ordinal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				qs, args = queryBuilder.Build(test.query)
-			)
+			qs, args := queryBuilder.Build(test.query)
 
 			assert.Equal(t, test.result, qs)
 			assert.Equal(t, test.args, args)
@@ -264,9 +262,7 @@ func TestQuery_WriteSelect(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteSelect(&buffer, test.table, test.selectQuery)
 			assert.Equal(t, test.result, buffer.String())
@@ -326,9 +322,7 @@ func TestQuery_WriteJoin(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteJoin(&buffer, "transactions", rel.Build("", test.query).JoinQuery)
 
@@ -364,9 +358,7 @@ func TestQuery_WriteWhere(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
@@ -402,9 +394,7 @@ func TestQuery_WriteWhere_ordinal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
@@ -451,9 +441,7 @@ func TestQuery_WriteWhere_SubQuery(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
@@ -502,9 +490,7 @@ func TestQuery_WriteWhere_SubQuery_ordinal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteWhere(&buffer, test.table, test.filter)
 
@@ -569,9 +555,7 @@ func TestQuery_WriteHaving(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteHaving(&buffer, test.table, test.filter)
 
@@ -607,9 +591,7 @@ func TestQuery_WriteHaving_ordinal(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.result, func(t *testing.T) {
-			var (
-				buffer = bufferFactory.Create()
-			)
+			buffer := bufferFactory.Create()
 
 			queryBuilder.WriteHaving(&buffer, test.table, test.filter)
 
