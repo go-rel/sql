@@ -33,8 +33,8 @@ type SQL struct {
 	Instrumenter     rel.Instrumenter
 }
 
-// DBType returns database type.
-func (s SQL) DBType() string {
+// Name returns database adapter name.
+func (s SQL) Name() string {
 	return "sql"
 }
 
