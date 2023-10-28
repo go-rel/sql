@@ -28,5 +28,5 @@ jobs:
       run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
       if: matrix.go == 1.19 && matrix.os == 'ubuntu-latest'
     - name: Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       if: matrix.go == 1.19 && matrix.os == 'ubuntu-latest'
