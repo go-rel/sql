@@ -21,7 +21,7 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
     - name: Check out code into the Go module directory
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Test
       run: go test -race ./...
     - name: Coverage
