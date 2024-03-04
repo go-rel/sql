@@ -6,7 +6,7 @@ toolchain go1.21.0
 
 require (
 	github.com/go-rel/rel v0.41.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
