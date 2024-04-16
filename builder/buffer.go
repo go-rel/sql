@@ -133,9 +133,6 @@ func (b Buffer) escape(table, value string) string {
 
 	var escaped_table string
 	if table != "" {
-		if i := strings.Index(strings.ToLower(table), " as "); i > -1 {
-			return b.escape(table[:i], "") + " AS " + b.Quoter.ID(table[i+4:])
-		}
 		if b.AllowTableSchema && strings.IndexByte(table, '.') >= 0 {
 			parts := strings.Split(table, ".")
 			for i, part := range parts {
@@ -143,8 +140,15 @@ func (b Buffer) escape(table, value string) string {
 				parts[i] = b.Quoter.ID(part)
 			}
 			escaped_table = strings.Join(parts, ".")
+		} else if i := strings.Index(strings.ToLower(table), " as "); i > -1 {
+			escaped_table = b.escape(table[:i], "") + " AS " + b.Quoter.ID(table[i+4:])
 		} else {
-			escaped_table = b.Quoter.ID(strings.ReplaceAll(table, ".", "_"))
+			parts := strings.Split(table, " ")
+			for i, part := range parts {
+				part = strings.TrimSpace(part)
+				parts[i] = b.Quoter.ID(part)
+			}
+			escaped_table = strings.Join(parts, " ")
 		}
 	}
 
