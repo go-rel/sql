@@ -129,7 +129,7 @@ func (b Buffer) escape_schema(table string) string {
 		}
 		return strings.Join(parts, ".")
 	} else {
-		return b.Quoter.ID(strings.ReplaceAll(table, ".", "_"))
+		return b.Quoter.ID(strings.ReplaceAll(strings.TrimSpace(table), ".", "_"))
 	}
 }
 
@@ -147,9 +147,9 @@ func (b Buffer) escape(table, value string) string {
 	var escaped_table string
 	if table != "" {
 		if i := strings.Index(strings.ToLower(table), " as "); i > -1 {
-			escaped_table = b.escape_schema(table[:i]) + " AS " + b.Quoter.ID(table[i+4:])
+			escaped_table = b.escape_schema(table[:i]) + " AS " + b.Quoter.ID(strings.TrimSpace(table[i+4:]))
 		} else if i := strings.Index(strings.ToLower(table), " "); i > -1 {
-			escaped_table = b.escape_schema(table[:i]) + " " + b.Quoter.ID(table[i+1:])
+			escaped_table = b.escape_schema(table[:i]) + " " + b.Quoter.ID(strings.TrimSpace(table[i+1:]))
 		} else {
 			escaped_table = b.escape_schema(table)
 		}
