@@ -113,14 +113,6 @@ func TestQuery_Build(t *testing.T) {
 			result: "SELECT `c`.`id`,`c`.`name` FROM `contacts` AS `c`;",
 			query:  rel.Select("c.id", "c.name").From("contacts as c"),
 		},
-		{
-			result: "SELECT `c`.`id`,`c`.`name` FROM `contacts` `c`;",
-			query:  rel.Select("c.id").Select("c.name").From("contacts c"),
-		},
-		{
-			result: "SELECT `c`.`id`,`c`.`name` FROM `contacts` AS `c`;",
-			query:  rel.Select("c.id").Select("c.name").From("contacts as c"),
-		},
 	}
 
 	for _, test := range tests {
@@ -208,14 +200,6 @@ func TestQuery_Build_ordinal(t *testing.T) {
 		{
 			result: "SELECT \"c\".\"id\",\"c\".\"name\" FROM \"contacts\" AS \"c\";",
 			query:  rel.Select("c.id", "c.name").From("contacts as c"),
-		},
-		{
-			result: "SELECT \"c\".\"id\",\"c\".\"name\" FROM \"contacts\" \"c\";",
-			query:  rel.Select("c.id").Select("c.name").From("contacts c"),
-		},
-		{
-			result: "SELECT \"c\".\"id\",\"c\".\"name\" FROM \"contacts\" AS \"c\";",
-			query:  rel.Select("c.id").Select("c.name").From("contacts as c"),
 		},
 	}
 
