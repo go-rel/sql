@@ -105,6 +105,18 @@ func TestQuery_Build(t *testing.T) {
 			result: "SELECT `users`.* FROM `users` FOR UPDATE;",
 			query:  rel.From("users").Lock("FOR UPDATE"),
 		},
+		{
+			result: "SELECT `contacts`.`id`,`contacts`.`name` FROM `contacts`;",
+			query:  rel.Select("id", "name").From("contacts"),
+		},
+		{
+			result: "SELECT `contacts`.`id`,`contacts`.`name` FROM `contacts`;",
+			query:  rel.Select("id").Select("name").From("contacts"),
+		},
+		{
+			result: "SELECT `contacts`.`id`,`contacts`.`name` FROM `contacts`;",
+			query:  rel.From("contacts").Select("id").Select("name"),
+		},
 	}
 
 	for _, test := range tests {
@@ -184,6 +196,18 @@ func TestQuery_Build_ordinal(t *testing.T) {
 		{
 			result: "SELECT \"users\".* FROM \"users\" FOR UPDATE;",
 			query:  rel.From("users").Lock("FOR UPDATE"),
+		},
+		{
+			result: "SELECT \"contacts\".\"id\",\"contacts\".\"name\" FROM \"contacts\";",
+			query:  rel.Select("id", "name").From("contacts"),
+		},
+		{
+			result: "SELECT \"contacts\".\"id\",\"contacts\".\"name\" FROM \"contacts\";",
+			query:  rel.Select("id").Select("name").From("contacts"),
+		},
+		{
+			result: "SELECT \"contacts\".\"id\",\"contacts\".\"name\" FROM \"contacts\";",
+			query:  rel.From("contacts").Select("id").Select("name"),
 		},
 	}
 
