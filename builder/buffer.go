@@ -120,6 +120,19 @@ func (b *Buffer) WriteEscape(value string) {
 	b.WriteString(b.escape("", value))
 }
 
+func (b Buffer) escapeSchema(table string) string {
+	if b.AllowTableSchema && strings.IndexByte(table, '.') >= 0 {
+		parts := strings.Split(table, ".")
+		for i, part := range parts {
+			part = strings.TrimSpace(part)
+			parts[i] = b.Quoter.ID(part)
+		}
+		return strings.Join(parts, ".")
+	} else {
+		return b.Quoter.ID(strings.ReplaceAll(strings.TrimSpace(table), ".", "_"))
+	}
+}
+
 func (b Buffer) escape(table, value string) string {
 	if table == "" && value == "*" {
 		return value
@@ -134,17 +147,9 @@ func (b Buffer) escape(table, value string) string {
 	var escaped_table string
 	if table != "" {
 		if i := strings.Index(strings.ToLower(table), " as "); i > -1 {
-			return b.escape(table[:i], "") + " AS " + b.Quoter.ID(table[i+4:])
-		}
-		if b.AllowTableSchema && strings.IndexByte(table, '.') >= 0 {
-			parts := strings.Split(table, ".")
-			for i, part := range parts {
-				part = strings.TrimSpace(part)
-				parts[i] = b.Quoter.ID(part)
-			}
-			escaped_table = strings.Join(parts, ".")
+			escaped_table = b.escapeSchema(table[:i]) + " AS " + b.Quoter.ID(strings.TrimSpace(table[i+4:]))
 		} else {
-			escaped_table = b.Quoter.ID(strings.ReplaceAll(table, ".", "_"))
+			escaped_table = b.escapeSchema(table)
 		}
 	}
 

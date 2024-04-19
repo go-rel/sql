@@ -105,6 +105,10 @@ func TestQuery_Build(t *testing.T) {
 			result: "SELECT `users`.* FROM `users` FOR UPDATE;",
 			query:  rel.From("users").Lock("FOR UPDATE"),
 		},
+		{
+			result: "SELECT `c`.`id`,`c`.`name` FROM `contacts` AS `c`;",
+			query:  rel.Select("c.id", "c.name").From("contacts as c"),
+		},
 	}
 
 	for _, test := range tests {
@@ -184,6 +188,10 @@ func TestQuery_Build_ordinal(t *testing.T) {
 		{
 			result: "SELECT \"users\".* FROM \"users\" FOR UPDATE;",
 			query:  rel.From("users").Lock("FOR UPDATE"),
+		},
+		{
+			result: "SELECT \"c\".\"id\",\"c\".\"name\" FROM \"contacts\" AS \"c\";",
+			query:  rel.Select("c.id", "c.name").From("contacts as c"),
 		},
 	}
 
