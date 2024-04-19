@@ -148,8 +148,6 @@ func (b Buffer) escape(table, value string) string {
 	if table != "" {
 		if i := strings.Index(strings.ToLower(table), " as "); i > -1 {
 			escaped_table = b.escapeSchema(table[:i]) + " AS " + b.Quoter.ID(strings.TrimSpace(table[i+4:]))
-		} else if i := strings.Index(strings.ToLower(table), " "); i > -1 {
-			escaped_table = b.escapeSchema(table[:i]) + " " + b.Quoter.ID(strings.TrimSpace(table[i+1:]))
 		} else {
 			escaped_table = b.escapeSchema(table)
 		}
