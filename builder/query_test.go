@@ -105,6 +105,36 @@ func TestQuery_Build(t *testing.T) {
 			result: "SELECT `users`.* FROM `users` FOR UPDATE;",
 			query:  rel.From("users").Lock("FOR UPDATE"),
 		},
+		{
+			result: "SELECT `c`.`id`,`c`.`name` FROM `contacts` AS `c`;",
+			query:  rel.Select("c.id", "c.name").From("contacts as c"),
+		},
+		{
+			result: "SELECT MAX(`c`.`id`) FROM `contacts` AS `c`;",
+			query:  rel.Select("MAX(id)").From("contacts as c"),
+		},
+		{
+			result: "SELECT MAX(`c`.`id`) FROM `contacts` AS `c`;",
+			query:  rel.Select("MAX(c.id)").From("contacts as c"),
+		},
+		{
+			result: "SELECT MAX(`c`.`id`) AS `max_id` FROM `contacts` AS `c`;",
+			query:  rel.Select("MAX(id) as max_id").From("contacts as c"),
+		},
+		{
+			result: "SELECT MAX(`c`.`id`) AS `max_id` FROM `contacts` AS `c`;",
+			query:  rel.Select("MAX(c.id) as max_id").From("contacts as c"),
+		},
+		{
+			result: "SELECT `c`.`id`,`c`.`name` FROM `contacts` AS `c` JOIN `users` AS `u` ON `c`.`user_id`=`u`.`id` WHERE `u`.`active`=?;",
+			args:   []any{true},
+			query:  rel.Select("c.id", "c.name").From("contacts as c").Join("users as u").Where(rel.Eq("u.active", true)),
+		},
+		{
+			result: "SELECT `c`.`id`,`c`.`name` FROM `contacts` AS `c` JOIN `users` AS `u` ON `u`.`id`=`c`.`user_id` WHERE `u`.`active`=?;",
+			args:   []any{true},
+			query:  rel.Select("c.id", "c.name").From("contacts as c").JoinOn("users as u", "u.id", "c.user_id").Where(rel.Eq("u.active", true)),
+		},
 	}
 
 	for _, test := range tests {
