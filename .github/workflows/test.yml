@@ -26,7 +26,9 @@ jobs:
       run: go test -race ./...
     - name: Coverage
       run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
-      if: matrix.go == 1.19 && matrix.os == 'ubuntu-latest'
+      if: matrix.go == 1.21 && matrix.os == 'ubuntu-latest'
     - name: Codecov
-      uses: codecov/codecov-action@v5
-      if: matrix.go == 1.19 && matrix.os == 'ubuntu-latest'
+      uses: codecov/codecov-action@v7
+      if: matrix.go == 1.21 && matrix.os == 'ubuntu-latest'
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
