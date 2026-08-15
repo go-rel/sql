@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        go: [1.21]
+        go: [1.26]
     runs-on: ${{ matrix.os }}
     steps:
     - name: Set up Go 1.x
@@ -26,9 +26,9 @@ jobs:
       run: go test -race ./...
     - name: Coverage
       run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
-      if: matrix.go == 1.21 && matrix.os == 'ubuntu-latest'
+      if: matrix.go == 1.26 && matrix.os == 'ubuntu-latest'
     - name: Codecov
       uses: codecov/codecov-action@v7
-      if: matrix.go == 1.21 && matrix.os == 'ubuntu-latest'
+      if: matrix.go == 1.26 && matrix.os == 'ubuntu-latest'
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
