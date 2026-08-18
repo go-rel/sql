@@ -1,8 +1,8 @@
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
 github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4HY=
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=
-github.com/go-rel/rel v0.42.0 h1:LxtI/Q7ConrivN+rp95LvLnu7QWU0stD9/ZpeR6OdrU=
-github.com/go-rel/rel v0.42.0/go.mod h1:7RaEaNz30kCt/14m4VgdVWXFzATWnqJ40f0z1DnAUyk=
+github.com/go-rel/rel v0.43.0 h1:0rIK4Mot7XQtMRg81HXoWhcuPJfbUmbpLZUspN0hnD4=
+github.com/go-rel/rel v0.43.0/go.mod h1:cx+wYNvWTrjNPamozm8sYaIjdmNWQYc7rhenwyVib6c=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
